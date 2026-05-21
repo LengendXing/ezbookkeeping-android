@@ -10,7 +10,7 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="email">Email</string>
-    <string name="nickname">Nickname</string>
+    <string name="nickname">Nickname (optional)</string>
     <string name="confirm_password">Confirm Password</string>
     <string name="two_factor_code">2FA Code (optional)</string>
     <string name="amount">Amount</string>
@@ -64,4 +64,7 @@
     <string name="version">Version %s</string>
     <string name="expense_by_category">Expense by Category</string>
     <string name="income_by_category">Income by Category</string>
+    <string name="tag_edit_placeholder">Tag Edit - Coming in Phase 2</string>
+    <string name="app_description">A personal bookkeeping application for tracking expenses, income, and transfers across multiple accounts and currencies.</string>
+    <string name="app_tech_stack">Built with Kotlin, Jetpack Compose, Room, Hilt</string>
 </resources>

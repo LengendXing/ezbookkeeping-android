@@ -17,7 +17,7 @@ class SettingsViewModel @Inject constructor(private val prefs: UserPreferences, 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    init { viewModelScope.launch { prefs.serverUrl.collect { _uiState.update { it.copy(serverUrl = it.serverUrl) } } } }
+    init { viewModelScope.launch { prefs.serverUrl.collect { url -> _uiState.update { it.copy(serverUrl = url) } } } }
 
     fun onServerUrlChange(v: String) { _uiState.update { it.copy(serverUrl = v) } }
     fun saveServerUrl() { viewModelScope.launch { prefs.saveServerUrl(_uiState.value.serverUrl) } }

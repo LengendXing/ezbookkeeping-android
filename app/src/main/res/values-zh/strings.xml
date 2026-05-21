@@ -10,7 +10,7 @@
     <string name="username">用户名</string>
     <string name="password">密码</string>
     <string name="email">邮箱</string>
-    <string name="nickname">昵称</string>
+    <string name="nickname">昵称（可选）</string>
     <string name="confirm_password">确认密码</string>
     <string name="two_factor_code">两步验证码（可选）</string>
     <string name="amount">金额</string>
@@ -64,4 +64,7 @@
     <string name="version">版本 %s</string>
     <string name="expense_by_category">支出按分类</string>
     <string name="income_by_category">收入按分类</string>
+    <string name="tag_edit_placeholder">标签编辑 - 将在第二阶段实现</string>
+    <string name="app_description">一款个人记账应用，用于追踪多账户、多币种的支出、收入和转账。</string>
+    <string name="app_tech_stack">使用 Kotlin、Jetpack Compose、Room、Hilt 构建</string>
 </resources>

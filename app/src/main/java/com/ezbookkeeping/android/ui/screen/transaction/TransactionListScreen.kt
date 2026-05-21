@@ -10,10 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ezbookkeeping.android.R
 import com.ezbookkeeping.android.data.db.entity.TransactionEntity
 import com.ezbookkeeping.android.data.db.entity.TransactionType
 import com.ezbookkeeping.android.ui.navigation.Routes
@@ -25,7 +27,7 @@ fun TransactionListScreen(navController: NavController) {
     val vm: com.ezbookkeeping.android.ui.screen.home.HomeViewModel = hiltViewModel()
     val state by vm.uiState.collectAsState()
 
-    Scaffold(topBar = { TopAppBar(title = { Text("Transactions") }) }, floatingActionButton = { FloatingActionButton(onClick = { navController.navigate(Routes.TRANSACTION_EDIT) }) { Icon(Icons.Default.Add, "New transaction") } }) { padding ->
+    Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.transactions)) }) }, floatingActionButton = { FloatingActionButton(onClick = { navController.navigate(Routes.TRANSACTION_EDIT) }) { Icon(Icons.Default.Add, "New transaction") } }) { padding ->
         if (state.isLoading) Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
         else LazyColumn(Modifier.fillMaxSize().padding(padding)) { items(state.transactions, key = { it.id }) { tx ->
             ListItem(headlineContent = { Text(tx.comment ?: tx.type.name) }, supportingContent = { Text(tx.date) }, trailingContent = {

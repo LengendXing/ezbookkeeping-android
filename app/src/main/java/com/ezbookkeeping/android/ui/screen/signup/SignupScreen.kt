@@ -6,11 +6,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.ezbookkeeping.android.R
 
 @Composable
 fun SignupScreen(navController: NavController) {
@@ -21,24 +23,24 @@ fun SignupScreen(navController: NavController) {
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize().padding(32.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Create Account", style = MaterialTheme.typography.headlineMedium)
+            Text(stringResource(R.string.create_account), style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(24.dp))
-            OutlinedTextField(value = state.username, onValueChange = vm::onUsernameChange, label = { Text("Username") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+            OutlinedTextField(value = state.username, onValueChange = vm::onUsernameChange, label = { Text(stringResource(R.string.username)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
             Spacer(Modifier.height(8.dp))
-            OutlinedTextField(value = state.email, onValueChange = vm::onEmailChange, label = { Text("Email") }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), singleLine = true)
+            OutlinedTextField(value = state.email, onValueChange = vm::onEmailChange, label = { Text(stringResource(R.string.email)) }, modifier = Modifier.fillMaxWidth(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email), singleLine = true)
             Spacer(Modifier.height(8.dp))
-            OutlinedTextField(value = state.nickname, onValueChange = vm::onNicknameChange, label = { Text("Nickname (optional)") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+            OutlinedTextField(value = state.nickname, onValueChange = vm::onNicknameChange, label = { Text(stringResource(R.string.nickname)) }, modifier = Modifier.fillMaxWidth(), singleLine = true)
             Spacer(Modifier.height(8.dp))
-            OutlinedTextField(value = state.password, onValueChange = vm::onPasswordChange, label = { Text("Password") }, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), singleLine = true)
+            OutlinedTextField(value = state.password, onValueChange = vm::onPasswordChange, label = { Text(stringResource(R.string.password)) }, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), singleLine = true)
             Spacer(Modifier.height(8.dp))
-            OutlinedTextField(value = state.confirmPassword, onValueChange = vm::onConfirmPasswordChange, label = { Text("Confirm Password") }, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), singleLine = true)
+            OutlinedTextField(value = state.confirmPassword, onValueChange = vm::onConfirmPasswordChange, label = { Text(stringResource(R.string.confirm_password)) }, modifier = Modifier.fillMaxWidth(), visualTransformation = PasswordVisualTransformation(), keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password), singleLine = true)
             if (state.error != null) { Spacer(Modifier.height(8.dp)); Text(state.error!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
             Spacer(Modifier.height(16.dp))
             Button(onClick = vm::signup, modifier = Modifier.fillMaxWidth().height(48.dp), enabled = !state.isLoading) {
-                if (state.isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary) else Text("Sign Up")
+                if (state.isLoading) CircularProgressIndicator(modifier = Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary) else Text(stringResource(R.string.sign_up))
             }
             Spacer(Modifier.height(8.dp))
-            TextButton(onClick = { navController.popBackStack() }) { Text("Already have an account? Sign In") }
+            TextButton(onClick = { navController.popBackStack() }) { Text(stringResource(R.string.already_have_account)) }
         }
     }
 }
