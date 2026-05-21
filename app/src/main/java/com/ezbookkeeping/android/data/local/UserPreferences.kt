@@ -24,11 +24,24 @@ class UserPreferences @Inject constructor(
         val IS_LOGGED_IN = booleanPreferencesKey("is_logged_in")
         val IS_LOCKED = booleanPreferencesKey("is_locked")
         val LOCK_TYPE = stringPreferencesKey("lock_type")
+        val LOCK_CODE = stringPreferencesKey("lock_code")
     }
 
     val serverUrl: Flow<String> = context.dataStore.data.map { it[SERVER_URL] ?: "" }
     val isLoggedIn: Flow<Boolean> = context.dataStore.data.map { it[IS_LOGGED_IN] ?: false }
     val isLocked: Flow<Boolean> = context.dataStore.data.map { it[IS_LOCKED] ?: false }
+    val lockType: Flow<com.ezbookkeeping.android.data.db.entity.LockType> = context.dataStore.data.map {
+        try { com.ezbookkeeping.android.data.db.entity.LockType.valueOf(it[LOCK_TYPE] ?: "NONE") }
+        catch (_: Exception) { com.ezbookkeeping.android.data.db.entity.LockType.NONE }
+    }
+
+    suspend fun setLockType(type: com.ezbookkeeping.android.data.db.entity.LockType) {
+        context.dataStore.edit { it[LOCK_TYPE] = type.name }
+    }
+
+    suspend fun setLockCode(code: String) {
+        context.dataStore.edit { it[LOCK_CODE] = code }
+    }
 
     suspend fun saveLogin(userId: Int, accessToken: String, refreshToken: String) {
         context.dataStore.edit { prefs ->

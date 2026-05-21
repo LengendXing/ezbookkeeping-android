@@ -10,10 +10,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class TemplateListUiState(val templates: List<TemplateEntity> = emptyList(), val isLoading: Boolean = false)
-
 @HiltViewModel
-class TemplateListViewModel @Inject constructor(private val templateRepo: TemplateRepository, private val authState: AuthState) : ViewModel() {
+class TemplateListViewModel @Inject constructor(
+    private val templateRepo: TemplateRepository,
+    private val authState: AuthState
+) : ViewModel() {
     private val _uiState = MutableStateFlow(TemplateListUiState())
     val uiState: StateFlow<TemplateListUiState> = _uiState.asStateFlow()
 
@@ -22,7 +23,13 @@ class TemplateListViewModel @Inject constructor(private val templateRepo: Templa
     fun loadTemplates() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            templateRepo.getByUserId(authState.userId).catch { _uiState.update { it.copy(isLoading = false) } }.collect { list -> _uiState.update { it.copy(templates = list, isLoading = false) } }
+            templateRepo.getByUserId(authState.userId)
+                .catch { _uiState.update { it.copy(isLoading = false) } }
+                .collect { list -> _uiState.update { it.copy(templates = list, isLoading = false) } }
         }
+    }
+
+    fun deleteTemplate(template: TemplateEntity) {
+        viewModelScope.launch { templateRepo.delete(template) }
     }
 }

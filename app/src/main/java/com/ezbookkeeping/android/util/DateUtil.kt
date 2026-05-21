@@ -21,6 +21,18 @@ object DateUtil {
         cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
         return formatDate(cal.time)
     }
+    fun lastMonthStart(): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.MONTH, -1)
+        cal.set(Calendar.DAY_OF_MONTH, 1)
+        return formatDate(cal.time)
+    }
+    fun lastMonthEnd(): String {
+        val cal = Calendar.getInstance()
+        cal.add(Calendar.MONTH, -1)
+        cal.set(Calendar.DAY_OF_MONTH, cal.getActualMaximum(Calendar.DAY_OF_MONTH))
+        return formatDate(cal.time)
+    }
     fun dayStart(): String = today()
     fun dayEnd(): String = today()
     fun weekStart(): String {

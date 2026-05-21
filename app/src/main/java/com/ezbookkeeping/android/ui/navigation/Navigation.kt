@@ -30,6 +30,7 @@ import com.ezbookkeeping.android.ui.screen.login.LoginScreen
 import com.ezbookkeeping.android.ui.screen.settings.SettingsScreen
 import com.ezbookkeeping.android.ui.screen.statistics.StatisticsScreen
 import com.ezbookkeeping.android.ui.screen.tag.TagListScreen
+import com.ezbookkeeping.android.ui.screen.tag.TagEditScreen
 import com.ezbookkeeping.android.ui.screen.template.TemplateListScreen
 import com.ezbookkeeping.android.ui.screen.transaction.TransactionEditScreen
 import com.ezbookkeeping.android.ui.screen.transaction.TransactionListScreen
@@ -39,6 +40,7 @@ import com.ezbookkeeping.android.ui.screen.user.DataManagementScreen
 import com.ezbookkeeping.android.ui.screen.user.SessionListScreen
 import com.ezbookkeeping.android.ui.screen.user.TwoFactorAuthScreen
 import com.ezbookkeeping.android.ui.screen.user.UserProfileScreen
+import com.ezbookkeeping.android.ui.screen.settings.ApplicationLockScreen
 
 object Routes {
     const val HOME = "home"
@@ -65,6 +67,7 @@ object Routes {
     const val TWO_FACTOR_AUTH = "user/2fa"
     const val SESSIONS = "user/sessions"
     const val DATA_MANAGEMENT = "user/data"
+    const val APPLICATION_LOCK = "settings/app-lock"
 }
 
 data class BottomNavItem(val route: String, val label: String, val icon: @Composable () -> Unit)
@@ -113,6 +116,7 @@ fun EZBookkeepingNavHost() {
             composable(Routes.CATEGORY_EDIT) { CategoryEditScreen(navController) }
             composable(Routes.CATEGORY_EDIT_WITH_ID, arguments = listOf(navArgument("categoryId") { type = NavType.IntType })) { CategoryEditScreen(navController, it.arguments?.getInt("categoryId")) }
             composable(Routes.TAG_LIST) { TagListScreen(navController) }
+            composable(Routes.TAG_EDIT) { TagEditScreen(navController) }
             composable(Routes.TEMPLATE_LIST) { TemplateListScreen(navController) }
             composable(Routes.STATISTICS) { StatisticsScreen(navController) }
             composable(Routes.EXCHANGE) { ExchangeRateScreen(navController) }
@@ -122,6 +126,7 @@ fun EZBookkeepingNavHost() {
             composable(Routes.TWO_FACTOR_AUTH) { TwoFactorAuthScreen(navController) }
             composable(Routes.SESSIONS) { SessionListScreen(navController) }
             composable(Routes.DATA_MANAGEMENT) { DataManagementScreen(navController) }
+            composable(Routes.APPLICATION_LOCK) { ApplicationLockScreen(navController) }
         }
     }
 }

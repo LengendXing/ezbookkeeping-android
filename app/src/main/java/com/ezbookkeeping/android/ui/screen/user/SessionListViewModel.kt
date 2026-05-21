@@ -3,6 +3,7 @@ package com.ezbookkeeping.android.ui.screen.user
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
 
 data class SessionListUiState(val sessions: List<SessionInfo> = emptyList())
 

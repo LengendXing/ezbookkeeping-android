@@ -10,8 +10,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class AccountListUiState(val accounts: List<AccountEntity> = emptyList(), val isLoading: Boolean = false)
-
 @HiltViewModel
 class AccountListViewModel @Inject constructor(
     private val accountRepo: AccountRepository,
@@ -25,9 +23,19 @@ class AccountListViewModel @Inject constructor(
     fun loadAccounts() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            accountRepo.getAccounts(authState.userId).catch { _uiState.update { it.copy(isLoading = false) } }.collect { list -> _uiState.update { it.copy(accounts = list, isLoading = false) } }
+            accountRepo.getAccounts(authState.userId)
+                .catch { _uiState.update { it.copy(isLoading = false) } }
+                .collect { list -> _uiState.update { it.copy(accounts = list, isLoading = false) } }
         }
     }
 
-    fun deleteAccount(account: AccountEntity) { viewModelScope.launch { accountRepo.deleteAccount(account) } }
+    fun deleteAccount(account: AccountEntity) {
+        viewModelScope.launch {
+            accountRepo.deleteAccount(account)
+        }
+    }
+
+    fun toggleBalance() {
+        _uiState.update { it.copy(showBalance = !it.showBalance) }
+    }
 }

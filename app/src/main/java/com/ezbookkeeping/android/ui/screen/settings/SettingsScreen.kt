@@ -25,20 +25,20 @@ fun SettingsScreen(navController: NavController) {
     Scaffold(topBar = { TopAppBar(title = { Text(stringResource(R.string.settings)) }) }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(2.dp)) {
             SectionHeader("User")
-            SettingsItem("User Profile") { /* TODO */ }
+            SettingsItem("User Profile") { navController.navigate(Routes.USER_PROFILE) }
             SettingsItem(stringResource(R.string.categories)) { navController.navigate(Routes.CATEGORY_LIST) }
             SettingsItem(stringResource(R.string.tags)) { navController.navigate(Routes.TAG_LIST) }
             SettingsItem(stringResource(R.string.templates)) { navController.navigate(Routes.TEMPLATE_LIST) }
-            SettingsItem("Data Management") { /* TODO */ }
-            SettingsItem("Two-Factor Authentication") { /* TODO */ }
-            SettingsItem("Device & Sessions") { /* TODO */ }
+            SettingsItem("Data Management") { navController.navigate(Routes.DATA_MANAGEMENT) }
+            SettingsItem("Two-Factor Authentication") { navController.navigate(Routes.TWO_FACTOR_AUTH) }
+            SettingsItem("Device & Sessions") { navController.navigate(Routes.SESSIONS) }
             SettingsItem(stringResource(R.string.sign_out), isDestructive = true, onClick = vm::logout)
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             SectionHeader("Application")
             SettingsToggleItem("Dark Theme", state.isDarkTheme, vm::onDarkThemeToggle)
             SettingsItem("Timezone", subtitle = state.timezone) { /* TODO */ }
-            SettingsItem("Application Lock", subtitle = if (state.isAppLockEnabled) "Enabled" else "Disabled") { navController.navigate(Routes.UNLOCK) }
+            SettingsItem("Application Lock", subtitle = if (state.isAppLockEnabled) "Enabled" else "Disabled") { navController.navigate(Routes.APPLICATION_LOCK) }
             SettingsItem(stringResource(R.string.exchange_rates), subtitle = state.exchangeRateLastUpdate) { navController.navigate(Routes.EXCHANGE) }
             SettingsToggleItem("Auto-update Exchange Rates", state.isAutoUpdateExchangeRates, vm::onAutoUpdateExchangeRatesToggle)
             SettingsToggleItem("Show Account Balance", state.showAccountBalance, vm::onShowAccountBalanceToggle)
