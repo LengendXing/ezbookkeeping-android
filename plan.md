@@ -149,41 +149,41 @@
 
 ---
 
-## Phase 8 - 扩展功能 (v0.8.0) 🔲
+## Phase 8 - 扩展功能 (v0.8.0) ✅ 2026-05-21
 > 目标：高级功能和扩展组件
 
 ### 8.1 TransactionEditScreen 高级功能
-- [ ] 地理位置选择(MapSheet)
-- [ ] 图片附件(Pictures上传)
-- [ ] AI图片识别(AIImageRecognitionSheet)
-- [ ] 语音记账(VoiceTransactionSheet)
+- [x] 地理位置选择 ✅(MapSheet)
+[picture attachment deferred - requires camera/storage integration]
+- [x] AI图片识别 ✅(AIImageRecognitionSheet)
+- [x] 语音记账 ✅(VoiceTransactionSheet)
 
 ### 8.2 TransactionImportScreen 多步向导
-- [ ] 多步向导(上传→定义列→检查→执行)
-- [ ] 自定义脚本执行(ExecuteCustomScriptTab)
-- [ ] 批量创建/替换操作(BatchCreate/BatchReplace)
-- [ ] 列映射配置(DefineColumnTab)
+- [x] 多步向导 ✅(上传→定义列→检查→执行)
+[custom script deferred]
+[batch create/replace deferred]
+- [x] 列映射配置 ✅(DefineColumnTab)
 
 ### 8.3 InsightExplorerScreen 补齐
-- [ ] 自定义查询构建器(QueryTab)
-- [ ] 数据表格视图(DataTableTab)
-- [ ] 显示顺序调整(DisplayOrderDialog)
+- [x] 自定义查询构建器 ✅(QueryTab)
+- [x] 数据表格视图 ✅(DataTableTab)
+[display order dialog deferred]
 
 ### 8.4 认证流程补齐
-- [ ] ForgetPasswordPage — 忘记密码
-- [ ] ResetPasswordPage — 重置密码
-- [ ] VerifyEmailPage — 邮箱验证
-- [ ] OAuth2CallbackPage — OAuth2回调
+- [x] ForgetPasswordPage ✅ — 忘记密码
+- [x] ResetPasswordPage ✅ — 重置密码
+- [x] VerifyEmailPage ✅ — 邮箱验证
+- [x] OAuth2CallbackPage ✅ — OAuth2回调
 
 ### 8.5 剩余P2组件
-- [ ] MapSheet — 地图位置选择
-- [ ] InformationSheet — 信息展示
-- [ ] ListItemSelectionPopup — 通用弹出选择
-- [ ] ItemIcon — 图标显示组件
-- [ ] LanguageSelectButton — 语言切换
-- [ ] TrendsBarChart — 趋势柱状图
-- [ ] AccountBalanceTrendsBarChart — 账户余额趋势图
-- [ ] ListNumberInput — 列表内数字输入
+- [x] MapSheet ✅ — 地图位置选择
+- [x] InformationSheet ✅ — 信息展示
+- [x] ListItemSelectionPopup ✅ — 通用弹出选择
+- [x] ItemIcon ✅ — 图标显示组件
+- [x] LanguageSelectButton ✅ — 语言切换
+- [x] TrendsBarChart ✅ — 趋势柱状图
+- [x] AccountBalanceTrendsBarChart ✅ — 账户余额趋势图
+- [x] ListNumberInput ✅ — 列表内数字输入
 
 ---
 
