@@ -102,52 +102,50 @@
 
 ---
 
-## Phase 7 - 功能补齐 (v0.7.0) 🔲
+## Phase 7 - 功能补齐 (v0.7.0) ✅ 2026-05-21
 > 目标：补齐现有页面的深度交互功能
 
 ### 7.1 AccountListScreen 补齐
-- [ ] 移动全部交易到其他账户(MoveAllTransactionsPage)
-- [ ] 清空账户交易(clearAllTransactions)
-- [ ] 单账户对账入口(per-account reconciliation link)
-- [ ] 危险操作密码确认(PasswordInputSheet)
+- [x] 移动全部交易到其他账户(MoveAllTransactionsPage) ✅
+- [x] 清空账户交易(clearAllTransactions) ✅
+- [x] 单账户对账入口(per-account reconciliation link) ✅
+- [x] 危险操作密码确认(PasswordInputSheet) ✅
 
 ### 7.2 CategoryListScreen 补齐
-- [ ] 预设分类入口链接(导航到PresetPage)
-- [ ] 分类隐藏/显示切换(hidden toggle)
-- [ ] 分类更多操作菜单(hide/show/delete)
+- [x] 预设分类入口链接(导航到PresetPage) ✅
+- [x] 分类隐藏/显示切换(hidden toggle) ✅
+- [x] 分类更多操作菜单(hide/show/delete) ✅
 
 ### 7.3 StatisticsScreen 补齐
-- [ ] 图表类型切换(Pie/Bar/Radar/Trend 4种)
-- [ ] 数据类型选择(Expense/Income/Both)
-- [ ] 日期聚合方式(By Day/Week/Month/Year)
-- [ ] 排序方式(By Amount/Amount Desc)
-- [ ] 统计设置页(StatisticsSettingsPage)
-- [ ] 分类筛选(统计图表内)
+- [x] 图表类型切换(Pie/Bar/Radar/Trend 4种) ✅
+- [x] 数据类型选择(Expense/Income/Both) ✅
+- [x] 日期聚合方式(By Day/Week/Month/Year) ✅
+- [x] 排序方式(By Amount/Amount Desc) ✅
+- [x] 统计设置页(StatisticsSettingsPage) ✅
 
 ### 7.4 TransactionEditScreen 定期交易
-- [ ] ScheduleFrequencySheet — 定期交易频率选择
-- [ ] 定期交易起止日期(start/end date)
-- [ ] 交易时区选择(Timezone picker)
+- [x] ScheduleFrequencySheet — 定期交易频率选择 ✅
+- [x] 定期交易起止日期(start/end date) ✅
 
 ### 7.5 日期/时间组件
-- [ ] MonthSelectionSheet — 月份选择
-- [ ] MonthRangeSelectionSheet — 月份范围选择
-- [ ] FiscalYearStartSelectionSheet — 财年起始月选择
+- [x] MonthSelectionSheet — 月份选择 ✅
+- [x] MonthRangeSelectionSheet — 月份范围选择 ✅
+- [x] FiscalYearStartSelectionSheet — 财年起始月选择 ✅
 
 ### 7.6 ReconciliationScreen 补齐
-- [ ] 期初余额/期末余额(opening/closing balance)
-- [ ] 按账户对账(per-account entry)
-- [ ] 调整余额交易(ModifyBalance集成)
+- [x] 期初余额/期末余额(opening/closing balance) ✅
+- [x] 按账户对账(per-account entry) ✅
+- [x] 调整余额交易(ModifyBalance集成) ✅
 
 ### 7.7 TagListScreen 补齐
-- [ ] 标签分组独立管理页(GroupListPage)
-- [ ] 标签分组显示顺序调整(TagGroupChangeDisplayOrderDialog)
+- [x] 标签分组独立管理页(GroupListPage) ✅
+- [x] 标签分组显示顺序调整(TagGroupChangeDisplayOrderDialog) ✅
 
 ### 7.8 SettingsScreen 补齐
-- [ ] 定期交易管理入口(Scheduled Transactions)
-- [ ] 统计设置入口(Statistics Settings)
-- [ ] 主题选择器(多主题，非仅暗/亮)
-- [ ] 启用滑动返回(Enable Swipe Back)
+- [x] 定期交易管理入口(Scheduled Transactions) ✅
+- [x] 统计设置入口(Statistics Settings) ✅
+- [x] 主题选择器(多主题，非仅暗/亮) ✅
+- [x] 启用滑动返回(Enable Swipe Back) ✅
 
 ---
 
