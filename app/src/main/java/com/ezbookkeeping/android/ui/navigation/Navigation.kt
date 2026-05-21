@@ -41,6 +41,18 @@ import com.ezbookkeeping.android.ui.screen.user.SessionListScreen
 import com.ezbookkeeping.android.ui.screen.user.TwoFactorAuthScreen
 import com.ezbookkeeping.android.ui.screen.user.UserProfileScreen
 import com.ezbookkeeping.android.ui.screen.settings.ApplicationLockScreen
+import com.ezbookkeeping.android.ui.screen.transaction.TransactionImportScreen
+import com.ezbookkeeping.android.ui.screen.transaction.CategoryPresetScreen
+import com.ezbookkeeping.android.ui.screen.transaction.ExchangeRateUpdateScreen
+import com.ezbookkeeping.android.ui.screen.transaction.ReconciliationScreen
+import com.ezbookkeeping.android.ui.screen.statistics.InsightExplorerScreen
+import com.ezbookkeeping.android.ui.screen.settings.PageSettingsScreen
+import com.ezbookkeeping.android.ui.screen.settings.TextSizeSettingsScreen
+import com.ezbookkeeping.android.ui.screen.settings.AccountFilterSettingsScreen
+import com.ezbookkeeping.android.ui.screen.settings.CategoryFilterSettingsScreen
+import com.ezbookkeeping.android.ui.screen.settings.TransactionTagFilterSettingsScreen
+import com.ezbookkeeping.android.ui.screen.settings.DisplayOrderSettingsScreen
+import com.ezbookkeeping.android.ui.screen.settings.CloudSyncSettingsScreen
 
 object Routes {
     const val HOME = "home"
@@ -68,6 +80,18 @@ object Routes {
     const val SESSIONS = "user/sessions"
     const val DATA_MANAGEMENT = "user/data"
     const val APPLICATION_LOCK = "settings/app-lock"
+    const val TRANSACTION_IMPORT = "transactions/import"
+    const val CATEGORY_PRESET = "categories/preset"
+    const val EXCHANGE_RATE_UPDATE = "settings/exchange-rate-update"
+    const val RECONCILIATION = "transactions/reconciliation"
+    const val INSIGHT_EXPLORER = "statistics/insight"
+    const val PAGE_SETTINGS = "settings/page-settings"
+    const val TEXT_SIZE_SETTINGS = "settings/text-size"
+    const val ACCOUNT_FILTER_SETTINGS = "settings/account-filter"
+    const val CATEGORY_FILTER_SETTINGS = "settings/category-filter"
+    const val TRANSACTION_TAG_FILTER_SETTINGS = "settings/transaction-tag-filter"
+    const val DISPLAY_ORDER_SETTINGS = "settings/display-order"
+    const val CLOUD_SYNC_SETTINGS = "settings/cloud-sync"
 }
 
 data class BottomNavItem(val route: String, val label: String, val icon: @Composable () -> Unit)
@@ -127,6 +151,18 @@ fun EZBookkeepingNavHost() {
             composable(Routes.SESSIONS) { SessionListScreen(navController) }
             composable(Routes.DATA_MANAGEMENT) { DataManagementScreen(navController) }
             composable(Routes.APPLICATION_LOCK) { ApplicationLockScreen(navController) }
+            composable(Routes.TRANSACTION_IMPORT) { TransactionImportScreen(navController) }
+            composable(Routes.CATEGORY_PRESET) { CategoryPresetScreen(navController) }
+            composable(Routes.EXCHANGE_RATE_UPDATE) { ExchangeRateUpdateScreen(navController) }
+            composable(Routes.RECONCILIATION) { ReconciliationScreen(navController) }
+            composable(Routes.INSIGHT_EXPLORER) { InsightExplorerScreen(navController) }
+            composable(Routes.PAGE_SETTINGS) { PageSettingsScreen(navController) }
+            composable(Routes.TEXT_SIZE_SETTINGS) { TextSizeSettingsScreen(navController) }
+            composable(Routes.ACCOUNT_FILTER_SETTINGS) { AccountFilterSettingsScreen(navController) }
+            composable(Routes.CATEGORY_FILTER_SETTINGS) { CategoryFilterSettingsScreen(navController) }
+            composable(Routes.TRANSACTION_TAG_FILTER_SETTINGS) { TransactionTagFilterSettingsScreen(navController) }
+            composable(Routes.DISPLAY_ORDER_SETTINGS) { DisplayOrderSettingsScreen(navController) }
+            composable(Routes.CLOUD_SYNC_SETTINGS) { CloudSyncSettingsScreen(navController) }
         }
     }
 }

@@ -30,6 +30,9 @@ fun SettingsScreen(navController: NavController) {
             SettingsItem(stringResource(R.string.tags)) { navController.navigate(Routes.TAG_LIST) }
             SettingsItem(stringResource(R.string.templates)) { navController.navigate(Routes.TEMPLATE_LIST) }
             SettingsItem("Data Management") { navController.navigate(Routes.DATA_MANAGEMENT) }
+            SettingsItem("Import Transactions") { navController.navigate(Routes.TRANSACTION_IMPORT) }
+            SettingsItem("Category Presets") { navController.navigate(Routes.CATEGORY_PRESET) }
+            SettingsItem("Reconciliation") { navController.navigate(Routes.RECONCILIATION) }
             SettingsItem("Two-Factor Authentication") { navController.navigate(Routes.TWO_FACTOR_AUTH) }
             SettingsItem("Device & Sessions") { navController.navigate(Routes.SESSIONS) }
             SettingsItem(stringResource(R.string.sign_out), isDestructive = true, onClick = vm::logout)
@@ -39,10 +42,22 @@ fun SettingsScreen(navController: NavController) {
             SettingsToggleItem("Dark Theme", state.isDarkTheme, vm::onDarkThemeToggle)
             SettingsItem("Timezone", subtitle = state.timezone) { /* TODO */ }
             SettingsItem("Application Lock", subtitle = if (state.isAppLockEnabled) "Enabled" else "Disabled") { navController.navigate(Routes.APPLICATION_LOCK) }
+            SettingsItem("Exchange Rate Update") { navController.navigate(Routes.EXCHANGE_RATE_UPDATE) }
             SettingsItem(stringResource(R.string.exchange_rates), subtitle = state.exchangeRateLastUpdate) { navController.navigate(Routes.EXCHANGE) }
             SettingsToggleItem("Auto-update Exchange Rates", state.isAutoUpdateExchangeRates, vm::onAutoUpdateExchangeRatesToggle)
             SettingsToggleItem("Show Account Balance", state.showAccountBalance, vm::onShowAccountBalanceToggle)
             SettingsToggleItem("Enable Animation", state.isAnimationEnabled, vm::onAnimationToggle)
+
+            HorizontalDivider(Modifier.padding(vertical = 8.dp))
+            SectionHeader("Display & Filters")
+            SettingsItem("Page Settings") { navController.navigate(Routes.PAGE_SETTINGS) }
+            SettingsItem("Text Size") { navController.navigate(Routes.TEXT_SIZE_SETTINGS) }
+            SettingsItem("Account Filter") { navController.navigate(Routes.ACCOUNT_FILTER_SETTINGS) }
+            SettingsItem("Category Filter") { navController.navigate(Routes.CATEGORY_FILTER_SETTINGS) }
+            SettingsItem("Transaction Tag Filter") { navController.navigate(Routes.TRANSACTION_TAG_FILTER_SETTINGS) }
+            SettingsItem("Display Order") { navController.navigate(Routes.DISPLAY_ORDER_SETTINGS) }
+            SettingsItem("Data Insights") { navController.navigate(Routes.INSIGHT_EXPLORER) }
+            SettingsItem("Cloud Sync") { navController.navigate(Routes.CLOUD_SYNC_SETTINGS) }
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             if (!state.isStandalone) {

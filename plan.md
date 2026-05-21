@@ -39,16 +39,7 @@
 - [x] maintain.md / plan.md 更新 ✅
 
 ## 后续迭代（未来会话）
-- [ ] 测试用例继续扩充（目标每个功能80+用例，当前总计215）
-- [ ] TransactionImportPage (P1) CSV/Excel导入交易
-- [ ] CategoryPresetPage (P1) 预设分类导入
-- [ ] ExchangeRateUpdatePage (P1) 汇率更新设置
-- [ ] ReconciliationStatementPage (P1) 对账单
-- [ ] InsightExplorerScreen (P1) 数据洞察/趋势分析
-- [ ] PageSettingsPage (P2) 页面显示设置
-- [ ] TextSizeSettingsPage (P2) 字体大小设置
-- [ ] 各种FilterSettingsPage (P2) 筛选设置
-- [ ] CloudSyncSettingsPage (P2) 云同步设置
+- [ ] 测试用例继续扩充（目标每个功能80+用例，当前总计305）
 - [ ] 无障碍支持优化
 - [ ] 语音记账
 - [ ] 性能 profiling

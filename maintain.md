@@ -1,5 +1,32 @@
 # ezBookkeeping Android - 变更日志
 
+## v0.5.0 - 2026-05-21
+### 变更内容
+- P1+P2 全部页面实现 + 90 新增测试用例
+### 影响范围
+- ui/screen/transaction/* (TransactionImport, CategoryPreset, ExchangeRateUpdate, Reconciliation 新增)
+- ui/screen/statistics/* (InsightExplorer 新增)
+- ui/screen/settings/* (PageSettings, TextSize, AccountFilter, CategoryFilter, TransactionTagFilter, DisplayOrder, CloudSync 新增)
+- ui/navigation/Navigation.kt (13 新路由)
+- ui/screen/settings/SettingsScreen.kt (9 新导航入口)
+- app/src/test/* (NewFeaturesTest 90个测试方法)
+### 功能列表
+- TransactionImportScreen: CSV/OFX/QIF格式选择, 文件选择, 预览列表, 确认导入
+- CategoryPresetScreen: 预设分类选择(Checkbox), 批量导入
+- ExchangeRateUpdateScreen: 自动更新开关, 频率选择(Daily/Weekly/Monthly), 来源选择(ECB/FRB/BoE), 手动更新
+- ReconciliationScreen: 对账余额汇总, 交易匹配/不匹配标记, 差异计算, 确认对账
+- InsightExplorerScreen: 周期选择(Weekly/Monthly/Yearly), 储蓄率卡片, 收支趋势图, Top分类进度条
+- PageSettingsScreen: 默认落地页, 概览卡片/金额/备注显示开关, 分页大小
+- TextSizeSettingsScreen: 字体缩放滑块(80%-150%), 实时预览
+- AccountFilterSettingsScreen: 账户显示筛选, 全选/取消全选
+- CategoryFilterSettingsScreen: 分类显示筛选(支出/收入分组), 全选/取消
+- TransactionTagFilterSettingsScreen: 标签筛选, 全选/取消
+- DisplayOrderSettingsScreen: 账户/分类排序(上下箭头)
+- CloudSyncSettingsScreen: WebDAV/Dropbox/GoogleDrive选择, 自动同步, Wi-Fi限制, 手动同步
+- Navigation: 13新路由注册(TRANSACTION_IMPORT, CATEGORY_PRESET, EXCHANGE_RATE_UPDATE, RECONCILIATION, INSIGHT_EXPLORER, PAGE/TEXT_SIZE/ACCOUNT_FILTER/CATEGORY_FILTER/TAG_FILTER/DISPLAY_ORDER/CLOUD_SYNC_SETTINGS)
+- SettingsScreen: 9个新导航入口(导入交易/预设分类/对账/汇率更新/页面设置/字体大小/账户筛选/分类筛选/标签筛选/显示顺序/数据洞察/云同步)
+- 90 新增单元测试: UiState默认值, 枚举值, 数据类创建, 业务逻辑验证
+
 ## v0.4.0 - 2026-05-21
 ### 变更内容
 - P0 页面全面重写 + ApplicationLockPage + 215 单元测试
