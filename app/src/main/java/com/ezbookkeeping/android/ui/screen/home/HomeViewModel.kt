@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.home
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.TemplateEntity
@@ -17,6 +18,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
+@Stable
 data class HomeUiState(
     val transactions: List<TransactionEntity> = emptyList(),
     val templates: List<TemplateEntity> = emptyList(),
@@ -107,7 +109,7 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             templateRepo.getByUserId(authState.userId)
                 .catch { }
-                .collect { list -> _uiState.update { it.copy(templates = list) } }
+                .distinctUntilChanged().collect { list -> _uiState.update { it.copy(templates = list) } }
         }
     }
 
@@ -124,25 +126,25 @@ class HomeViewModel @Inject constructor(
 
         transactionRepo.getByDateRange(userId, DateUtil.monthStart(), DateUtil.monthEnd())
             .catch { _uiState.update { it.copy(isLoading = false) } }
-            .collect { monthList ->
+            .distinctUntilChanged().collect { monthList ->
                 val monthExp = monthList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
                 val monthInc = monthList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
 
                 transactionRepo.getByDateRange(userId, DateUtil.dayStart(), DateUtil.dayEnd())
                     .catch { }
-                    .collect { todayList ->
+                    .distinctUntilChanged().collect { todayList ->
                         val todayExp = todayList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
                         val todayInc = todayList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
 
                         transactionRepo.getByDateRange(userId, DateUtil.weekStart(), DateUtil.weekEnd())
                             .catch { }
-                            .collect { weekList ->
+                            .distinctUntilChanged().collect { weekList ->
                                 val weekExp = weekList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
                                 val weekInc = weekList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
 
                                 transactionRepo.getByDateRange(userId, DateUtil.yearStart(), DateUtil.yearEnd())
                                     .catch { }
-                                    .collect { yearList ->
+                                    .distinctUntilChanged().collect { yearList ->
                                         val yearExp = yearList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
                                         val yearInc = yearList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
 

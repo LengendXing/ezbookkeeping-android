@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.signup
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.remote.api.EZBookkeepingApi
@@ -8,6 +9,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class SignupUiState(val username: String = "", val password: String = "", val confirmPassword: String = "", val email: String = "", val nickname: String = "", val isLoading: Boolean = false, val error: String? = null, val signupSuccess: Boolean = false)
 
 @HiltViewModel

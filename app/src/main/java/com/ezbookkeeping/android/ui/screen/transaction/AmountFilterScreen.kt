@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.transaction
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class AmountFilterUiState(
     val minAmount: String = "",
     val maxAmount: String = "",

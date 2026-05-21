@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.template
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import com.ezbookkeeping.android.data.db.entity.TransactionType
 import com.ezbookkeeping.android.ui.navigation.Routes
 import com.ezbookkeeping.android.util.AmountUtil
 
+@Stable
 data class TemplateListUiState(val templates: List<TemplateEntity> = emptyList(), val isLoading: Boolean = false)
 
 @OptIn(ExperimentalMaterial3Api::class)

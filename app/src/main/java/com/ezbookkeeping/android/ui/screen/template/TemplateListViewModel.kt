@@ -25,7 +25,7 @@ class TemplateListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             templateRepo.getByUserId(authState.userId)
                 .catch { _uiState.update { it.copy(isLoading = false) } }
-                .collect { list -> _uiState.update { it.copy(templates = list, isLoading = false) } }
+                .distinctUntilChanged().collect { list -> _uiState.update { it.copy(templates = list, isLoading = false) } }
         }
     }
 

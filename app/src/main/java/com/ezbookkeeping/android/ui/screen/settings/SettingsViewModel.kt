@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.settings
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.local.UserPreferences
@@ -10,6 +11,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class SettingsUiState(
     val serverUrl: String = "", val isLoggedOut: Boolean = false, val isStandalone: Boolean = true,
     val isDarkTheme: Boolean = false, val themeColor: String = "Default", val timezone: String = "System Default",
@@ -28,7 +30,7 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     init {
-        viewModelScope.launch { prefs.serverUrl.collect { url -> _uiState.update { it.copy(serverUrl = url) } } }
+        viewModelScope.launch { prefs.serverUrl.distinctUntilChanged().collect { url -> _uiState.update { it.copy(serverUrl = url) } } }
         _uiState.update { it.copy(isStandalone = authState.isStandalone) }
     }
 

@@ -18,7 +18,7 @@ class ApplicationLockViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            prefs.lockType.collect { type -> _uiState.update { it.copy(currentLockType = type) } }
+            prefs.lockType.distinctUntilChanged().collect { type -> _uiState.update { it.copy(currentLockType = type) } }
         }
     }
 

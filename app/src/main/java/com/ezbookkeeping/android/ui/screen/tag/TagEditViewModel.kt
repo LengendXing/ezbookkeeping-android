@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.tag
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.TagEntity
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class TagEditUiState(
     val name: String = "", val groupId: Int = 0, val tagId: Int = 0,
     val tagGroups: List<TagGroupEntity> = emptyList(),
@@ -28,7 +30,7 @@ class TagEditViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            tagRepo.getGroups(authState.userId).collect { groups -> _uiState.update { it.copy(tagGroups = groups) } }
+            tagRepo.getGroups(authState.userId).distinctUntilChanged().collect { groups -> _uiState.update { it.copy(tagGroups = groups) } }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.statistics
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.TransactionType
@@ -20,6 +21,7 @@ enum class SortMethod { AMOUNT_ASC, AMOUNT_DESC }
 
 data class CategoryStat(val categoryId: Int?, val name: String, val color: String, val amount: Double, val percentage: Float)
 
+@Stable
 data class StatisticsUiState(
     val totalExpense: Double = 0.0,
     val totalIncome: Double = 0.0,
@@ -58,7 +60,7 @@ class StatisticsViewModel @Inject constructor(
 
     private fun loadCategories() {
         viewModelScope.launch {
-            categoryRepo.getByUserId(authState.userId).collect { list -> _uiState.update { it.copy(categories = list) } }
+            categoryRepo.getByUserId(authState.userId).distinctUntilChanged().collect { list -> _uiState.update { it.copy(categories = list) } }
         }
     }
 
@@ -78,7 +80,7 @@ class StatisticsViewModel @Inject constructor(
             val (start, end) = dateRangeToPair(_uiState.value.dateRange)
             transactionRepo.getByDateRange(authState.userId, start, end)
                 .catch { _uiState.update { it.copy(isLoading = false) } }
-                .collect { list ->
+                .distinctUntilChanged().collect { list ->
                     val cats = _uiState.value.categories
                     val expense = list.filter { it.type == TransactionType.EXPENSE }
                     val income = list.filter { it.type == TransactionType.INCOME }

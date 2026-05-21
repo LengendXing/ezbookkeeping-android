@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.user
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.local.UserPreferences
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class UserProfileUiState(
     val username: String = "", val nickname: String = "", val email: String = "",
     val language: String = "English", val defaultCurrency: String = "CNY",

@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.settings
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -7,6 +8,7 @@ import javax.inject.Inject
 
 data class DisplayOrderItem(val id: Int, val name: String, val order: Int)
 
+@Stable
 data class DisplayOrderSettingsUiState(
     val accountOrder: List<DisplayOrderItem> = emptyList(),
     val categoryOrder: List<DisplayOrderItem> = emptyList(),

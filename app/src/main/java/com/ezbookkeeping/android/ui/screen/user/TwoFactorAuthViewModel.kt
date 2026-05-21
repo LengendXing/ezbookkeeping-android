@@ -1,11 +1,13 @@
 package com.ezbookkeeping.android.ui.screen.user
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import com.ezbookkeeping.android.service.TotpService
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+@Stable
 data class TwoFactorAuthUiState(val isEnabled: Boolean = false, val backupCodes: List<String> = emptyList())
 
 @HiltViewModel

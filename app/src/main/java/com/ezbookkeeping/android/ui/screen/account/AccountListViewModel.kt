@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.account
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.AccountEntity
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class AccountListUiState(
     val accounts: List<AccountEntity> = emptyList(),
     val isLoading: Boolean = false,
@@ -33,7 +35,7 @@ class AccountListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             accountRepo.getAccounts(authState.userId)
                 .catch { _uiState.update { it.copy(isLoading = false) } }
-                .collect { list -> _uiState.update { it.copy(accounts = list, isLoading = false) } }
+                .distinctUntilChanged().collect { list -> _uiState.update { it.copy(accounts = list, isLoading = false) } }
         }
     }
 

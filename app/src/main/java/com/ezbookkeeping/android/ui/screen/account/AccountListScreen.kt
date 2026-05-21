@@ -27,6 +27,7 @@ import com.ezbookkeeping.android.data.db.entity.AccountType
 import com.ezbookkeeping.android.ui.component.PasswordInputSheet
 import com.ezbookkeeping.android.ui.navigation.Routes
 import com.ezbookkeeping.android.util.AmountUtil
+import com.ezbookkeeping.android.util.parseColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -175,4 +176,3 @@ private fun AccountOverviewCard(accounts: List<AccountEntity>, showBalance: Bool
     )
 }
 
-private fun parseColor(hex: String): Color = try { val c = hex.removePrefix("#"); val v = c.toLong(16); if (c.length == 6) Color(0xFF000000 or v) else Color(v) } catch (_: Exception) { Color(0xFF6200EE) }

@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.tag
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,7 @@ import com.ezbookkeeping.android.data.db.entity.TagEntity
 import com.ezbookkeeping.android.data.db.entity.TagGroupEntity
 import com.ezbookkeeping.android.ui.navigation.Routes
 
+@Stable
 data class TagListUiState(
     val groups: List<TagGroupEntity> = emptyList(),
     val tags: List<TagEntity> = emptyList(),

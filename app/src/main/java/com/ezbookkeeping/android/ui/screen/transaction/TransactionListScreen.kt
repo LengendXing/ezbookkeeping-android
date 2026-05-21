@@ -33,6 +33,7 @@ import com.ezbookkeeping.android.ui.component.TagItem
 import com.ezbookkeeping.android.ui.navigation.Routes
 import com.ezbookkeeping.android.util.AmountUtil
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,7 +58,7 @@ fun TransactionListScreen(navController: NavController) {
             val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             val totalItems = listState.layoutInfo.totalItemsCount
             lastVisible >= totalItems - 3
-        }.collect { nearEnd ->
+        }.distinctUntilChanged().collect { nearEnd ->
             if (nearEnd && state.hasMore && !state.isLoading) {
                 vm.loadMore()
             }

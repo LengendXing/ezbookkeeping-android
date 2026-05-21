@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.transaction
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.*
@@ -30,6 +31,7 @@ data class TransactionMonthGroup(
     val totalIncome: Double
 )
 
+@Stable
 data class TransactionListUiState(
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -80,7 +82,7 @@ class TransactionListViewModel @Inject constructor(
                 .combine(_tagFilter) { params, tagF -> params.copy(tagFilter = tagF) }
                 .combine(_dateRangeStart) { params, dateStart -> params.copy(dateRangeStart = dateStart) }
                 .combine(_dateRangeEnd) { params, dateEnd -> params.copy(dateRangeEnd = dateEnd) }
-                .collect { p ->
+                .distinctUntilChanged().collect { p ->
                     var filtered = p.txs
                     if (p.type != null) filtered = filtered.filter { it.type == p.type }
                     if (p.query.isNotBlank()) filtered = filtered.filter { it.comment?.contains(p.query, ignoreCase = true) == true }
@@ -114,10 +116,10 @@ class TransactionListViewModel @Inject constructor(
 
     private fun loadPickerData() {
         val userId = authState.userId
-        viewModelScope.launch { accountRepo.getAccounts(userId).collect { list -> _uiState.update { s -> s.copy(accounts = list) } } }
-        viewModelScope.launch { categoryRepo.getByUserId(userId).collect { list -> _uiState.update { s -> s.copy(categories = list) } } }
-        viewModelScope.launch { tagRepo.getTags(userId).collect { list -> _uiState.update { s -> s.copy(tags = list) } } }
-        viewModelScope.launch { tagRepo.getGroups(userId).collect { list -> _uiState.update { s -> s.copy(tagGroups = list) } } }
+        viewModelScope.launch { accountRepo.getAccounts(userId).distinctUntilChanged().collect { list -> _uiState.update { s -> s.copy(accounts = list) } } }
+        viewModelScope.launch { categoryRepo.getByUserId(userId).distinctUntilChanged().collect { list -> _uiState.update { s -> s.copy(categories = list) } } }
+        viewModelScope.launch { tagRepo.getTags(userId).distinctUntilChanged().collect { list -> _uiState.update { s -> s.copy(tags = list) } } }
+        viewModelScope.launch { tagRepo.getGroups(userId).distinctUntilChanged().collect { list -> _uiState.update { s -> s.copy(tagGroups = list) } } }
     }
 
     fun loadTransactions() {
@@ -125,7 +127,7 @@ class TransactionListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             transactionRepo.getByDateRange(authState.userId, DateUtil.yearStart(), DateUtil.yearEnd())
                 .catch { _uiState.update { it.copy(isLoading = false) } }
-                .collect { list ->
+                .distinctUntilChanged().collect { list ->
                     _transactions.value = list
                     _uiState.update { it.copy(isLoading = false) }
                 }
@@ -138,7 +140,7 @@ class TransactionListViewModel @Inject constructor(
             _displayCount.value = 50
             transactionRepo.getByDateRange(authState.userId, DateUtil.yearStart(), DateUtil.yearEnd())
                 .catch { _uiState.update { it.copy(isRefreshing = false) } }
-                .collect { list ->
+                .distinctUntilChanged().collect { list ->
                     _transactions.value = list
                     _uiState.update { it.copy(isRefreshing = false) }
                 }

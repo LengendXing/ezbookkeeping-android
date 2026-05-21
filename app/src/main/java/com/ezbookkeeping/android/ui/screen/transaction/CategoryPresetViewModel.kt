@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.transaction
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -12,6 +13,7 @@ data class CategoryPreset(
     val subCategories: List<String>
 )
 
+@Stable
 data class CategoryPresetUiState(
     val isLoading: Boolean = false,
     val presets: List<CategoryPreset> = emptyList(),

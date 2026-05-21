@@ -28,6 +28,7 @@ import com.ezbookkeeping.android.R
 import com.ezbookkeeping.android.data.db.entity.CategoryEntity
 import com.ezbookkeeping.android.data.db.entity.CategoryType
 import com.ezbookkeeping.android.ui.navigation.Routes
+import com.ezbookkeeping.android.util.parseColor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -132,4 +133,3 @@ private fun CategoryRow(category: CategoryEntity, indent: Int, onClick: () -> Un
     )
 }
 
-private fun parseColor(hex: String): Color = try { val c = hex.removePrefix("#"); val v = c.toLong(16); if (c.length == 6) Color(0xFF000000 or v) else Color(v) } catch (_: Exception) { Color(0xFF6200EE) }

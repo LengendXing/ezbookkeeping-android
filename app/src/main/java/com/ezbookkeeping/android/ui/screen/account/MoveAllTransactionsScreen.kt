@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.account
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -26,6 +27,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class MoveAllTransactionsUiState(
     val sourceAccount: AccountEntity? = null,
     val targetAccountId: Int? = null,
@@ -49,7 +51,7 @@ class MoveAllTransactionsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             accountRepo.getAccounts(authState.userId)
-                .collect { list -> _uiState.update { it.copy(accounts = list) } }
+                .distinctUntilChanged().collect { list -> _uiState.update { it.copy(accounts = list) } }
         }
     }
 

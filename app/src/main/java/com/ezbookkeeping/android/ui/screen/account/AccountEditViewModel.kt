@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.account
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.AccountEntity
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class AccountEditUiState(
     val name: String = "", val type: AccountType = AccountType.ASSET, val currency: String = "CNY",
     val icon: String = "wallet", val color: String = "#1B6B4D",

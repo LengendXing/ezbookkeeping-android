@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.transaction
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,6 +20,7 @@ import com.ezbookkeeping.android.util.AmountUtil
 
 data class ImportPreviewRow(val date: String, val comment: String, val amount: Double, val type: TransactionType)
 
+@Stable
 data class TransactionImportUiState(
     val isLoading: Boolean = false,
     val previewData: List<ImportPreviewRow> = emptyList(),

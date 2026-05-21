@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.statistics
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class StatisticsSettingsUiState(
     val defaultChartType: ChartType = ChartType.PIE,
     val defaultDataType: DataDataType = DataDataType.EXPENSE,

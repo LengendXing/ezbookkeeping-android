@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.statistics
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -14,6 +15,7 @@ data class InsightData(
     val isPositive: Boolean
 )
 
+@Stable
 data class InsightExplorerUiState(
     val isLoading: Boolean = false,
     val selectedPeriod: InsightPeriod = InsightPeriod.MONTHLY,

@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.category
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.CategoryEntity
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class CategoryEditUiState(
     val name: String = "", val type: CategoryType = CategoryType.EXPENSE,
     val icon: String = "label", val color: String = "#F44336",
@@ -32,7 +34,7 @@ class CategoryEditViewModel @Inject constructor(
 
     private fun loadParentCategories() {
         viewModelScope.launch {
-            categoryRepo.getByUserId(authState.userId).collect { all ->
+            categoryRepo.getByUserId(authState.userId).distinctUntilChanged().collect { all ->
                 val parents = all.filter { it.parentId == null }
                 _uiState.update { it.copy(parentCategories = parents) }
             }

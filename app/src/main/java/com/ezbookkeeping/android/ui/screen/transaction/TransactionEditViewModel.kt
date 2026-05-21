@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.transaction
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.*
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class TransactionEditUiState(
     val type: TransactionType = TransactionType.EXPENSE,
     val typeExt: TransactionTypeExt = TransactionTypeExt.EXPENSE,
@@ -54,10 +56,10 @@ class TransactionEditViewModel @Inject constructor(
 
     private fun loadPickerData() {
         val userId = authState.userId
-        viewModelScope.launch { accountRepo.getAccounts(userId).collect { list -> _uiState.update { it.copy(accounts = list) } } }
-        viewModelScope.launch { categoryRepo.getByUserId(userId).collect { list -> _uiState.update { it.copy(categories = list) } } }
-        viewModelScope.launch { tagRepo.getTags(userId).collect { list -> _uiState.update { it.copy(tags = list) } } }
-        viewModelScope.launch { tagRepo.getGroups(userId).collect { list -> _uiState.update { it.copy(tagGroups = list) } } }
+        viewModelScope.launch { accountRepo.getAccounts(userId).distinctUntilChanged().collect { list -> _uiState.update { it.copy(accounts = list) } } }
+        viewModelScope.launch { categoryRepo.getByUserId(userId).distinctUntilChanged().collect { list -> _uiState.update { it.copy(categories = list) } } }
+        viewModelScope.launch { tagRepo.getTags(userId).distinctUntilChanged().collect { list -> _uiState.update { it.copy(tags = list) } } }
+        viewModelScope.launch { tagRepo.getGroups(userId).distinctUntilChanged().collect { list -> _uiState.update { it.copy(tagGroups = list) } } }
     }
 
     fun onTypeExtChange(t: TransactionTypeExt) {

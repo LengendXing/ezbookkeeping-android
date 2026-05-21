@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.settings
 
+import androidx.compose.runtime.Stable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -15,6 +16,7 @@ import androidx.navigation.NavController
 import com.ezbookkeeping.android.R
 import com.ezbookkeeping.android.data.db.entity.LockType
 
+@Stable
 data class ApplicationLockUiState(
     val currentLockType: LockType = LockType.NONE,
     val isSettingPin: Boolean = false,

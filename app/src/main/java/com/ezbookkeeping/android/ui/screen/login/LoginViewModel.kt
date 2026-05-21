@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.login
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.local.UserPreferences
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class LoginUiState(
     val username: String = "", val password: String = "", val twoFaCode: String = "",
     val isLoading: Boolean = false, val error: String? = null, val tips: String? = null,

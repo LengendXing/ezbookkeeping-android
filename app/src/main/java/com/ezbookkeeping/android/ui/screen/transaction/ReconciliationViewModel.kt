@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.transaction
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.AccountEntity
@@ -21,6 +22,7 @@ data class ReconciliationRow(
     val isMatched: Boolean
 )
 
+@Stable
 data class ReconciliationUiState(
     val isLoading: Boolean = false,
     val statementBalance: Double = 0.0,
@@ -51,7 +53,7 @@ class ReconciliationViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             accountRepo.getAccounts(authState.userId)
                 .catch { _uiState.update { it.copy(isLoading = false) } }
-                .collect { list -> _uiState.update { it.copy(accounts = list, isLoading = false) } }
+                .distinctUntilChanged().collect { list -> _uiState.update { it.copy(accounts = list, isLoading = false) } }
         }
     }
 

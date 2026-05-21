@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.category
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.CategoryEntity
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class CategoryListUiState(
     val categories: List<CategoryEntity> = emptyList(),
     val isLoading: Boolean = false,
@@ -33,7 +35,7 @@ class CategoryListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             categoryRepo.getByUserId(authState.userId)
                 .catch { _uiState.update { it.copy(isLoading = false) } }
-                .collect { list -> _uiState.update { it.copy(categories = list, isLoading = false) } }
+                .distinctUntilChanged().collect { list -> _uiState.update { it.copy(categories = list, isLoading = false) } }
         }
     }
 

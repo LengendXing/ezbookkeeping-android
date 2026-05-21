@@ -1,10 +1,12 @@
 package com.ezbookkeeping.android.ui.screen.user
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
+@Stable
 data class DataManagementUiState(val isExporting: Boolean = false, val isImporting: Boolean = false)
 
 @HiltViewModel

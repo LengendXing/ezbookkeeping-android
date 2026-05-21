@@ -1,5 +1,6 @@
 package com.ezbookkeeping.android.ui.screen.exchange
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.ExchangeRateEntity
@@ -9,6 +10,7 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+@Stable
 data class ExchangeRateUiState(val rates: List<ExchangeRateEntity> = emptyList(), val isLoading: Boolean = false)
 
 @HiltViewModel
@@ -21,7 +23,7 @@ class ExchangeRateViewModel @Inject constructor(private val rateRepo: ExchangeRa
     fun loadRates() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-            rateRepo.getAll().catch { _uiState.update { it.copy(isLoading = false) } }.collect { list -> _uiState.update { it.copy(rates = list, isLoading = false) } }
+            rateRepo.getAll().catch { _uiState.update { it.copy(isLoading = false) } }.distinctUntilChanged().collect { list -> _uiState.update { it.copy(rates = list, isLoading = false) } }
         }
     }
 

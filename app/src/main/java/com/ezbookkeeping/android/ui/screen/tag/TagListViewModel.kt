@@ -26,7 +26,7 @@ class TagListViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true) }
             combine(tagRepo.getGroups(authState.userId), tagRepo.getTags(authState.userId)) { groups, tags ->
                 TagListUiState(groups = groups, tags = tags, isLoading = false)
-            }.catch { _uiState.update { it.copy(isLoading = false) } }.collect { state -> _uiState.update { state } }
+            }.catch { _uiState.update { it.copy(isLoading = false) } }.distinctUntilChanged().collect { state -> _uiState.update { state } }
         }
     }
 
