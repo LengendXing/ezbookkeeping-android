@@ -1,8 +1,15 @@
 package com.ezbookkeeping.android.ui.screen.transaction
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ezbookkeeping.android.data.db.entity.AccountEntity
+import com.ezbookkeeping.android.data.repository.AccountRepository
+import com.ezbookkeeping.android.data.repository.TransactionRepository
+import com.ezbookkeeping.android.ui.navigation.AuthState
+import com.ezbookkeeping.android.ui.navigation.Routes
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class ReconciliationRow(
@@ -19,41 +26,76 @@ data class ReconciliationUiState(
     val statementBalance: Double = 0.0,
     val bookBalance: Double = 0.0,
     val difference: Double = 0.0,
+    val openingBalance: Double = -1.0,
+    val closingBalance: Double = -1.0,
     val reconciliationDate: String = "",
     val rows: List<ReconciliationRow> = emptyList(),
     val isReconciling: Boolean = false,
-    val result: String? = null
+    val result: String? = null,
+    val accounts: List<AccountEntity> = emptyList(),
+    val selectedAccountId: Int? = null,
+    val selectedAccountName: String? = null
 )
 
 @HiltViewModel
-class ReconciliationViewModel @Inject constructor() : ViewModel() {
+class ReconciliationViewModel @Inject constructor(
+    private val accountRepo: AccountRepository,
+    private val transactionRepo: TransactionRepository,
+    private val authState: AuthState
+) : ViewModel() {
     private val _uiState = MutableStateFlow(ReconciliationUiState())
     val uiState: StateFlow<ReconciliationUiState> = _uiState.asStateFlow()
 
-    fun setStatementBalance(amount: Double) {
-        val diff = amount - _uiState.value.bookBalance
-        _uiState.update { it.copy(statementBalance = amount, difference = diff) }
+    fun loadAccounts() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            accountRepo.getAccounts(authState.userId)
+                .catch { _uiState.update { it.copy(isLoading = false) } }
+                .collect { list -> _uiState.update { it.copy(accounts = list, isLoading = false) } }
+        }
     }
 
-    fun loadSampleData() {
-        _uiState.update { it.copy(isLoading = true) }
-        val rows = listOf(
-            ReconciliationRow("2025-01-01", "Opening Balance", 10000.0, 10000.0, 0.0, true),
-            ReconciliationRow("2025-01-05", "Salary Deposit", 5000.0, 5000.0, 0.0, true),
-            ReconciliationRow("2025-01-10", "Rent Payment", -2000.0, -2100.0, -100.0, false),
-            ReconciliationRow("2025-01-15", "Grocery", -150.0, -150.0, 0.0, true),
-            ReconciliationRow("2025-01-20", "Transfer In", 800.0, 800.0, 0.0, true),
-            ReconciliationRow("2025-01-25", "Utility Bill", -200.0, -200.0, 0.0, true)
-        )
-        val stmtBal = 10000.0 + 5000.0 + 800.0
-        val bookBal = 10000.0 + 5000.0 - 2100.0 - 150.0 + 800.0 - 200.0
-        _uiState.update { it.copy(isLoading = false, rows = rows, statementBalance = stmtBal, bookBalance = bookBal, difference = stmtBal - bookBal, reconciliationDate = "2025-01-31") }
+    fun selectAccount(accountId: Int) {
+        val acct = _uiState.value.accounts.find { it.id == accountId }
+        _uiState.update { it.copy(selectedAccountId = accountId, selectedAccountName = acct?.name, openingBalance = -1.0, closingBalance = -1.0, rows = emptyList(), result = null) }
+        loadAccountTransactions(accountId)
+    }
+
+    private fun loadAccountTransactions(accountId: Int) {
+        viewModelScope.launch {
+            transactionRepo.getByDateRange(authState.userId, "1970-01-01", "2099-12-31")
+                .first()
+                .filter { it.sourceAccountId == accountId || it.destinationAccountId == accountId }
+                .let { txs ->
+                    val rows = txs.map { tx ->
+                        val amount = if (tx.sourceAccountId == accountId) -tx.sourceAmount else (tx.destinationAmount ?: 0.0)
+                        ReconciliationRow(tx.date, tx.comment ?: "Transaction", amount, amount, 0.0, true)
+                    }
+                    val bookBal = rows.sumOf { it.bookAmount }
+                    _uiState.update { it.copy(rows = rows, bookBalance = bookBal, difference = if (_uiState.value.closingBalance >= 0) _uiState.value.closingBalance - bookBal else 0.0) }
+                }
+        }
+    }
+
+    fun setOpeningBalance(amountStr: String) {
+        val amount = amountStr.toDoubleOrNull() ?: 0.0
+        _uiState.update { it.copy(openingBalance = amount) }
+    }
+
+    fun setClosingBalance(amountStr: String) {
+        val amount = amountStr.toDoubleOrNull() ?: 0.0
+        _uiState.update { it.copy(closingBalance = amount, statementBalance = amount, difference = amount - _uiState.value.bookBalance) }
+    }
+
+    fun createAdjustBalance(navController: androidx.navigation.NavController) {
+        val accountId = _uiState.value.selectedAccountId ?: return
+        navController.navigate(Routes.TRANSACTION_EDIT)
     }
 
     fun reconcile() {
         _uiState.update { it.copy(isReconciling = true) }
         val unmatched = _uiState.value.rows.count { !it.isMatched }
-        val msg = if (unmatched == 0) "All items matched. Account is reconciled." else "$unmatched item(s) have discrepancies that need review."
+        val msg = if (unmatched == 0 && _uiState.value.difference == 0.0) "All items matched. Account is reconciled." else "${unmatched} item(s) have discrepancies. Difference: ${_uiState.value.difference}"
         _uiState.update { it.copy(isReconciling = false, result = msg) }
     }
 }

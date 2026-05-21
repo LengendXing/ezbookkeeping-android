@@ -4,15 +4,23 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.AccountEntity
 import com.ezbookkeeping.android.data.repository.AccountRepository
+import com.ezbookkeeping.android.data.repository.TransactionRepository
 import com.ezbookkeeping.android.ui.navigation.AuthState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class AccountListUiState(
+    val accounts: List<AccountEntity> = emptyList(),
+    val isLoading: Boolean = false,
+    val showBalance: Boolean = true
+)
+
 @HiltViewModel
 class AccountListViewModel @Inject constructor(
     private val accountRepo: AccountRepository,
+    private val transactionRepo: TransactionRepository,
     private val authState: AuthState
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountListUiState())
@@ -35,7 +43,13 @@ class AccountListViewModel @Inject constructor(
         }
     }
 
-    fun toggleBalance() {
-        _uiState.update { it.copy(showBalance = !it.showBalance) }
+    fun toggleBalance() { _uiState.update { it.copy(showBalance = !it.showBalance) } }
+
+    fun clearAllTransactions(account: AccountEntity) {
+        viewModelScope.launch {
+            transactionRepo.getByDateRange(authState.userId, "", "")
+                .first().filter { it.sourceAccountId == account.id || it.destinationAccountId == account.id }
+                .forEach { transactionRepo.delete(it) }
+        }
     }
 }

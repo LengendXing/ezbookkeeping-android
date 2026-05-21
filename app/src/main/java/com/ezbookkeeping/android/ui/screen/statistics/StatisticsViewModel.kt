@@ -13,6 +13,11 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class ChartType { PIE, BAR, RADAR, TREND }
+enum class DataDataType { EXPENSE, INCOME, BOTH }
+enum class DateAggregation { DAY, WEEK, MONTH, YEAR }
+enum class SortMethod { AMOUNT_ASC, AMOUNT_DESC }
+
 data class CategoryStat(val categoryId: Int?, val name: String, val color: String, val amount: Double, val percentage: Float)
 
 data class StatisticsUiState(
@@ -23,7 +28,11 @@ data class StatisticsUiState(
     val incomeByCategory: List<CategoryStat> = emptyList(),
     val isLoading: Boolean = false,
     val dateRange: DateRange = DateRange.THIS_MONTH,
-    val categories: List<CategoryEntity> = emptyList()
+    val categories: List<CategoryEntity> = emptyList(),
+    val chartType: ChartType = ChartType.PIE,
+    val dataType: DataDataType = DataDataType.EXPENSE,
+    val aggregation: DateAggregation = DateAggregation.MONTH,
+    val sortMethod: SortMethod = SortMethod.AMOUNT_DESC
 )
 
 enum class DateRange(val label: String) {
@@ -57,6 +66,11 @@ class StatisticsViewModel @Inject constructor(
         _uiState.update { it.copy(dateRange = range) }
         loadStatistics()
     }
+
+    fun setChartType(type: ChartType) { _uiState.update { it.copy(chartType = type) } }
+    fun setDataType(type: DataDataType) { _uiState.update { it.copy(dataType = type) } }
+    fun setAggregation(agg: DateAggregation) { _uiState.update { it.copy(aggregation = agg) } }
+    fun setSortMethod(method: SortMethod) { _uiState.update { it.copy(sortMethod = method) } }
 
     fun loadStatistics() {
         viewModelScope.launch {

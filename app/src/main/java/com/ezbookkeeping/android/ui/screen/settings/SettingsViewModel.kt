@@ -12,10 +12,10 @@ import javax.inject.Inject
 
 data class SettingsUiState(
     val serverUrl: String = "", val isLoggedOut: Boolean = false, val isStandalone: Boolean = true,
-    val isDarkTheme: Boolean = false, val timezone: String = "System Default",
+    val isDarkTheme: Boolean = false, val themeColor: String = "Default", val timezone: String = "System Default",
     val isAppLockEnabled: Boolean = false, val exchangeRateLastUpdate: String = "",
     val isAutoUpdateExchangeRates: Boolean = false, val showAccountBalance: Boolean = true,
-    val isAnimationEnabled: Boolean = true, val version: String = "0.3.0"
+    val isAnimationEnabled: Boolean = true, val isSwipeBackEnabled: Boolean = true, val version: String = "0.7.0"
 )
 
 @HiltViewModel
@@ -37,6 +37,7 @@ class SettingsViewModel @Inject constructor(
     fun onAutoUpdateExchangeRatesToggle(v: Boolean) { _uiState.update { it.copy(isAutoUpdateExchangeRates = v) } }
     fun onShowAccountBalanceToggle(v: Boolean) { _uiState.update { it.copy(showAccountBalance = v) } }
     fun onAnimationToggle(v: Boolean) { _uiState.update { it.copy(isAnimationEnabled = v) } }
+    fun onSwipeBackToggle(v: Boolean) { _uiState.update { it.copy(isSwipeBackEnabled = v) } }
 
     fun saveServerUrl() { viewModelScope.launch { prefs.saveServerUrl(_uiState.value.serverUrl) } }
 

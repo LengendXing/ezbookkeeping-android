@@ -38,12 +38,16 @@ fun TagListScreen(navController: NavController) {
     var groupToDelete by remember { mutableStateOf<TagGroupEntity?>(null) }
     var showAddGroupDialog by remember { mutableStateOf(false) }
     var newGroupName by remember { mutableStateOf("") }
+    var showDisplayOrderDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.tags)) },
                 actions = {
+                    IconButton(onClick = { navController.navigate(Routes.TAG_GROUP_LIST) }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Manage Groups")
+                    }
                     IconButton(onClick = { showAddGroupDialog = true }) {
                         Icon(Icons.Default.Add, contentDescription = "Add group")
                     }
@@ -148,6 +152,46 @@ fun TagListScreen(navController: NavController) {
                 }) { Text(stringResource(R.string.save)) }
             },
             dismissButton = { TextButton(onClick = { showAddGroupDialog = false; newGroupName = "" }) { Text(stringResource(R.string.cancel)) } }
+        )
+    }
+
+    // Display order dialog
+    if (showDisplayOrderDialog) {
+        val orderedGroups = state.groups.sortedBy { it.order }.toMutableStateList()
+        AlertDialog(
+            onDismissRequest = { showDisplayOrderDialog = false },
+            title = { Text("Group Display Order") },
+            text = {
+                LazyColumn {
+                    items(orderedGroups.size) { index ->
+                        val group = orderedGroups[index]
+                        Row(Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(group.name, modifier = Modifier.weight(1f))
+                            IconButton(onClick = {
+                                if (index > 0) {
+                                    val prev = orderedGroups[index - 1]
+                                    orderedGroups[index] = prev
+                                    orderedGroups[index - 1] = group
+                                }
+                            }, enabled = index > 0) { Text("^") }
+                            IconButton(onClick = {
+                                if (index < orderedGroups.lastIndex) {
+                                    val next = orderedGroups[index + 1]
+                                    orderedGroups[index] = next
+                                    orderedGroups[index + 1] = group
+                                }
+                            }, enabled = index < orderedGroups.lastIndex) { Text("v") }
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    vm.reorderGroups(orderedGroups.toList())
+                    showDisplayOrderDialog = false
+                }) { Text("Save") }
+            },
+            dismissButton = { TextButton(onClick = { showDisplayOrderDialog = false }) { Text("Cancel") } }
         )
     }
 }

@@ -18,11 +18,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-enum class ChartType { PIE, BAR, RADAR, TREND }
-enum class DataDataType { EXPENSE, INCOME, BOTH }
-enum class DateAggregation { DAY, WEEK, MONTH, YEAR }
-enum class SortMethod { AMOUNT_ASC, AMOUNT_DESC }
-
 data class StatisticsSettingsUiState(
     val defaultChartType: ChartType = ChartType.PIE,
     val defaultDataType: DataDataType = DataDataType.EXPENSE,

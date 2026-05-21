@@ -49,4 +49,12 @@ class TagListViewModel @Inject constructor(
             ))
         }
     }
+
+    fun reorderGroups(reordered: List<TagGroupEntity>) {
+        viewModelScope.launch {
+            reordered.forEachIndexed { index, group ->
+                tagRepo.upsertGroup(group.copy(order = index + 1))
+            }
+        }
+    }
 }

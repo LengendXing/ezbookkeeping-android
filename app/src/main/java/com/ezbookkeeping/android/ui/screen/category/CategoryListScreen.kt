@@ -8,6 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,21 +29,22 @@ import com.ezbookkeeping.android.data.db.entity.CategoryEntity
 import com.ezbookkeeping.android.data.db.entity.CategoryType
 import com.ezbookkeeping.android.ui.navigation.Routes
 
-data class CategoryListUiState(
-    val categories: List<CategoryEntity> = emptyList(),
-    val isLoading: Boolean = false,
-    val selectedType: CategoryType = CategoryType.EXPENSE
-)
-
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun CategoryListScreen(navController: NavController) {
     val vm: CategoryListViewModel = hiltViewModel()
     val state by vm.uiState.collectAsState()
-    var categoryToDelete by remember { mutableStateOf<CategoryEntity?>(null) }
+    var categoryActions by remember { mutableStateOf<CategoryEntity?>(null) }
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text(stringResource(R.string.categories)) }) },
+        topBar = {
+            TopAppBar(title = { Text(stringResource(R.string.categories)) },
+                actions = {
+                    IconButton(onClick = { navController.navigate(Routes.CATEGORY_PRESET) }) {
+                        Icon(Icons.Default.Visibility, contentDescription = "Presets", modifier = Modifier.size(20.dp))
+                    }
+                })
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate(Routes.CATEGORY_EDIT) }) {
                 Icon(Icons.Default.Add, contentDescription = "Add category")
@@ -49,43 +53,40 @@ fun CategoryListScreen(navController: NavController) {
     ) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                CategoryTypeChip("Expense", state.selectedType == CategoryType.EXPENSE) { vm.setType(CategoryType.EXPENSE) }
-                CategoryTypeChip("Income", state.selectedType == CategoryType.INCOME) { vm.setType(CategoryType.INCOME) }
-                CategoryTypeChip("Transfer", state.selectedType == CategoryType.TRANSFER) { vm.setType(CategoryType.TRANSFER) }
+                CategoryType.entries.forEach { type ->
+                    FilterChip(selected = state.selectedType == type, onClick = { vm.setType(type) },
+                        label = { Text(type.name.lowercase().replaceFirstChar { it.uppercase() } , style = MaterialTheme.typography.labelSmall) })
+                }
+            }
+            // Show hidden toggle
+            Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
+                Text("Show hidden", style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+                Switch(checked = state.showHidden, onCheckedChange = { vm.toggleShowHidden() })
             }
 
             if (state.isLoading) {
                 Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
             } else {
-                val filtered = state.categories.filter { it.type == state.selectedType }
+                val filtered = state.categories.filter { it.type == state.selectedType && (state.showHidden || !it.isHidden) }
                 val roots = filtered.filter { it.parentId == null }
                 val childrenMap = filtered.filter { it.parentId != null }.groupBy { it.parentId }
 
                 LazyColumn(contentPadding = PaddingValues(vertical = 4.dp)) {
                     if (roots.isEmpty()) {
-                        item {
-                            Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) {
-                                Text("No categories", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                        }
+                        item { Box(Modifier.fillMaxWidth().padding(48.dp), contentAlignment = Alignment.Center) { Text("No categories", color = MaterialTheme.colorScheme.onSurfaceVariant) } }
                     }
                     roots.forEach { root ->
                         item(key = root.id) {
-                            CategoryRow(
-                                category = root,
-                                indent = 0,
+                            CategoryRow(root, 0,
                                 onClick = { navController.navigate(Routes.CATEGORY_EDIT + "/${root.id}") },
-                                onLongPress = { categoryToDelete = root }
-                            )
+                                onLongPress = { categoryActions = root })
                         }
-                        val children = childrenMap[root.id].orEmpty()
-                        items(children, key = { it.id }) { child ->
-                            CategoryRow(
-                                category = child,
-                                indent = 1,
-                                onClick = { navController.navigate(Routes.CATEGORY_EDIT + "/${child.id}") },
-                                onLongPress = { categoryToDelete = child }
-                            )
+                        childrenMap[root.id].orEmpty().forEach { child ->
+                            item(key = child.id) {
+                                CategoryRow(child, 1,
+                                    onClick = { navController.navigate(Routes.CATEGORY_EDIT + "/${child.id}") },
+                                    onLongPress = { categoryActions = child })
+                            }
                         }
                     }
                 }
@@ -93,18 +94,19 @@ fun CategoryListScreen(navController: NavController) {
         }
     }
 
-    if (categoryToDelete != null) {
-        AlertDialog(
-            onDismissRequest = { categoryToDelete = null },
-            title = { Text("Delete Category") },
-            text = { Text("Are you sure you want to delete \"${categoryToDelete?.name}\"?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    categoryToDelete?.let { vm.deleteCategory(it) }
-                    categoryToDelete = null
-                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+    // Category actions menu
+    categoryActions?.let { cat ->
+        AlertDialog(onDismissRequest = { categoryActions = null },
+            title = { Text(cat.name) },
+            text = {
+                Column {
+                    TextButton(onClick = { categoryActions = null; navController.navigate(Routes.CATEGORY_EDIT + "/${cat.id}") }) { Text("Edit") }
+                    TextButton(onClick = { vm.toggleHidden(cat); categoryActions = null }) { Text(if (cat.isHidden) "Show" else "Hide") }
+                    HorizontalDivider()
+                    TextButton(onClick = { vm.deleteCategory(cat); categoryActions = null }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                }
             },
-            dismissButton = { TextButton(onClick = { categoryToDelete = null }) { Text(stringResource(R.string.cancel)) } }
+            confirmButton = { TextButton(onClick = { categoryActions = null }) { Text("Cancel") } }
         )
     }
 }
@@ -120,37 +122,14 @@ private fun CategoryRow(category: CategoryEntity, indent: Int, onClick: () -> Un
     val bgColor = parseColor(category.color)
     ListItem(
         headlineContent = {
-            Text(
-                category.name,
-                fontWeight = if (indent == 0) FontWeight.Medium else FontWeight.Normal,
-                maxLines = 1, overflow = TextOverflow.Ellipsis
-            )
-        },
-        leadingContent = {
-            Box(
-                Modifier.size(36.dp).clip(MaterialTheme.shapes.small).background(bgColor),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(category.icon, fontSize = 16.sp, color = Color.White)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(category.name, fontWeight = if (indent == 0) FontWeight.Medium else FontWeight.Normal, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                if (category.isHidden) { Spacer(Modifier.width(4.dp)); Text("(hidden)", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) }
             }
         },
-        modifier = Modifier
-            .padding(start = (indent * 32).dp)
-            .combinedClickable(onClick = onClick, onLongClick = onLongPress)
-            .padding(horizontal = 8.dp)
+        leadingContent = { Box(Modifier.size(36.dp).clip(MaterialTheme.shapes.small).background(bgColor), contentAlignment = Alignment.Center) { Text(category.icon, fontSize = 16.sp, color = Color.White) } },
+        modifier = Modifier.padding(start = (indent * 32).dp).combinedClickable(onClick = onClick, onLongClick = onLongPress).padding(horizontal = 8.dp)
     )
 }
 
-private fun parseColor(hex: String): Color {
-    return try {
-        val cleaned = hex.removePrefix("#")
-        val colorVal = cleaned.toLong(16)
-        when (cleaned.length) {
-            6 -> Color(0xFF000000 or colorVal)
-            8 -> Color(colorVal)
-            else -> Color(0xFF6200EE)
-        }
-    } catch (_: Exception) {
-        Color(0xFF6200EE)
-    }
-}
+private fun parseColor(hex: String): Color = try { val c = hex.removePrefix("#"); val v = c.toLong(16); if (c.length == 6) Color(0xFF000000 or v) else Color(v) } catch (_: Exception) { Color(0xFF6200EE) }

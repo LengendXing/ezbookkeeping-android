@@ -40,6 +40,9 @@ fun TransactionEditScreen(navController: NavController, transactionId: Int? = nu
     var showDateTimePicker by remember { mutableStateOf(false) }
     var showTagPicker by remember { mutableStateOf(false) }
     var showMoreMenu by remember { mutableStateOf(false) }
+    var showScheduleFreqPicker by remember { mutableStateOf(false) }
+    var showScheduleStartPicker by remember { mutableStateOf(false) }
+    var showScheduleEndPicker by remember { mutableStateOf(false) }
 
     Scaffold(topBar = {
         TopAppBar(
@@ -203,6 +206,35 @@ fun TransactionEditScreen(navController: NavController, transactionId: Int? = nu
                 )
             }
 
+            // Scheduled transaction section
+            item {
+                HorizontalDivider()
+                Text("Schedule", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text("Frequency") },
+                    supportingContent = { Text(state.scheduleFrequency?.label ?: "Not scheduled") },
+                    modifier = Modifier.clickable { showScheduleFreqPicker = true }
+                )
+            }
+            if (state.scheduleFrequency != null) {
+                item {
+                    ListItem(
+                        headlineContent = { Text("Start Date") },
+                        supportingContent = { Text(state.scheduleStartDate.ifBlank { "Select start date" }) },
+                        modifier = Modifier.clickable { showScheduleStartPicker = true }
+                    )
+                }
+                item {
+                    ListItem(
+                        headlineContent = { Text("End Date") },
+                        supportingContent = { Text(state.scheduleEndDate.ifBlank { "No end date" }) },
+                        modifier = Modifier.clickable { showScheduleEndPicker = true }
+                    )
+                }
+            }
+
             // Error
             if (state.error != null) {
                 item { Text(state.error!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
@@ -307,4 +339,28 @@ fun TransactionEditScreen(navController: NavController, transactionId: Int? = nu
             onConfirm = { vm.setTagIds(it) }
         )
     }
+
+    // Schedule frequency picker
+    ScheduleFrequencySheet(
+        visible = showScheduleFreqPicker,
+        selected = state.scheduleFrequency ?: ScheduleFrequency.MONTHLY,
+        onDismiss = { showScheduleFreqPicker = false },
+        onSelect = { vm.setScheduleFrequency(it); showScheduleFreqPicker = false }
+    )
+
+    // Schedule start date
+    DateSelectionSheet(
+        visible = showScheduleStartPicker,
+        initialDate = state.scheduleStartDate,
+        onDismiss = { showScheduleStartPicker = false },
+        onSelect = { vm.setScheduleStartDate(it); showScheduleStartPicker = false }
+    )
+
+    // Schedule end date
+    DateSelectionSheet(
+        visible = showScheduleEndPicker,
+        initialDate = state.scheduleEndDate,
+        onDismiss = { showScheduleEndPicker = false },
+        onSelect = { vm.setScheduleEndDate(it); showScheduleEndPicker = false }
+    )
 }

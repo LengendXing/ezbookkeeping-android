@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ezbookkeeping.android.data.db.entity.*
 import com.ezbookkeeping.android.data.repository.*
 import com.ezbookkeeping.android.ui.navigation.AuthState
+import com.ezbookkeeping.android.ui.component.ScheduleFrequency
 import com.ezbookkeeping.android.util.DateUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -30,7 +31,10 @@ data class TransactionEditUiState(
     val accounts: List<AccountEntity> = emptyList(),
     val categories: List<CategoryEntity> = emptyList(),
     val tags: List<TagEntity> = emptyList(),
-    val tagGroups: List<TagGroupEntity> = emptyList()
+    val tagGroups: List<TagGroupEntity> = emptyList(),
+    val scheduleFrequency: ScheduleFrequency? = null,
+    val scheduleStartDate: String = "",
+    val scheduleEndDate: String = ""
 )
 
 @HiltViewModel
@@ -77,6 +81,9 @@ class TransactionEditViewModel @Inject constructor(
         _uiState.update { it.copy(tagIds = if (current.contains(tagId)) current - tagId else current + tagId) }
     }
     fun setTagIds(ids: List<Int>) { _uiState.update { it.copy(tagIds = ids) } }
+    fun setScheduleFrequency(f: ScheduleFrequency) { _uiState.update { it.copy(scheduleFrequency = f) } }
+    fun setScheduleStartDate(d: String) { _uiState.update { it.copy(scheduleStartDate = d) } }
+    fun setScheduleEndDate(d: String) { _uiState.update { it.copy(scheduleEndDate = d) } }
 
     fun loadTransaction(id: Int) {
         viewModelScope.launch {

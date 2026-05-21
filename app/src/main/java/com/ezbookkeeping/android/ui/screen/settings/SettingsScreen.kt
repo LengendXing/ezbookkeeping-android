@@ -33,6 +33,7 @@ fun SettingsScreen(navController: NavController) {
             SettingsItem("Import Transactions") { navController.navigate(Routes.TRANSACTION_IMPORT) }
             SettingsItem("Category Presets") { navController.navigate(Routes.CATEGORY_PRESET) }
             SettingsItem("Reconciliation") { navController.navigate(Routes.RECONCILIATION) }
+            SettingsItem("Scheduled Transactions") { /* TODO scheduled tx list */ }
             SettingsItem("Two-Factor Authentication") { navController.navigate(Routes.TWO_FACTOR_AUTH) }
             SettingsItem("Device & Sessions") { navController.navigate(Routes.SESSIONS) }
             SettingsItem(stringResource(R.string.sign_out), isDestructive = true, onClick = vm::logout)
@@ -40,6 +41,7 @@ fun SettingsScreen(navController: NavController) {
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             SectionHeader("Application")
             SettingsToggleItem("Dark Theme", state.isDarkTheme, vm::onDarkThemeToggle)
+            SettingsItem("Theme Color", subtitle = state.themeColor) { /* TODO theme picker */ }
             SettingsItem("Timezone", subtitle = state.timezone) { /* TODO */ }
             SettingsItem("Application Lock", subtitle = if (state.isAppLockEnabled) "Enabled" else "Disabled") { navController.navigate(Routes.APPLICATION_LOCK) }
             SettingsItem("Exchange Rate Update") { navController.navigate(Routes.EXCHANGE_RATE_UPDATE) }
@@ -47,6 +49,7 @@ fun SettingsScreen(navController: NavController) {
             SettingsToggleItem("Auto-update Exchange Rates", state.isAutoUpdateExchangeRates, vm::onAutoUpdateExchangeRatesToggle)
             SettingsToggleItem("Show Account Balance", state.showAccountBalance, vm::onShowAccountBalanceToggle)
             SettingsToggleItem("Enable Animation", state.isAnimationEnabled, vm::onAnimationToggle)
+            SettingsToggleItem("Enable Swipe Back", state.isSwipeBackEnabled, vm::onSwipeBackToggle)
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))
             SectionHeader("Display & Filters")
@@ -57,6 +60,7 @@ fun SettingsScreen(navController: NavController) {
             SettingsItem("Transaction Tag Filter") { navController.navigate(Routes.TRANSACTION_TAG_FILTER_SETTINGS) }
             SettingsItem("Display Order") { navController.navigate(Routes.DISPLAY_ORDER_SETTINGS) }
             SettingsItem("Data Insights") { navController.navigate(Routes.INSIGHT_EXPLORER) }
+            SettingsItem("Statistics Settings") { navController.navigate(Routes.STATISTICS_SETTINGS) }
             SettingsItem("Cloud Sync") { navController.navigate(Routes.CLOUD_SYNC_SETTINGS) }
 
             HorizontalDivider(Modifier.padding(vertical = 8.dp))

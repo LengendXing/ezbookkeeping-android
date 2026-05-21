@@ -56,6 +56,7 @@ import com.ezbookkeeping.android.ui.screen.settings.CloudSyncSettingsScreen
 import com.ezbookkeeping.android.ui.screen.transaction.AmountFilterScreen
 import com.ezbookkeeping.android.ui.screen.account.MoveAllTransactionsScreen
 import com.ezbookkeeping.android.ui.screen.statistics.StatisticsSettingsScreen
+import com.ezbookkeeping.android.ui.screen.tag.TagGroupListScreen
 
 object Routes {
     const val HOME = "home"
@@ -99,6 +100,7 @@ object Routes {
     const val MOVE_ALL_TRANSACTIONS = "accounts/move-all-transactions"
     const val MOVE_ALL_TRANSACTIONS_WITH_ID = "accounts/move-all-transactions/{accountId}"
     const val STATISTICS_SETTINGS = "settings/statistics-settings"
+    const val TAG_GROUP_LIST = "tags/groups"
 }
 
 data class BottomNavItem(val route: String, val label: String, val icon: @Composable () -> Unit)
@@ -174,6 +176,7 @@ fun EZBookkeepingNavHost() {
             composable(Routes.MOVE_ALL_TRANSACTIONS) { MoveAllTransactionsScreen(navController) }
             composable(Routes.MOVE_ALL_TRANSACTIONS_WITH_ID, arguments = listOf(navArgument("accountId") { type = NavType.IntType })) { MoveAllTransactionsScreen(navController, it.arguments?.getInt("accountId")) }
             composable(Routes.STATISTICS_SETTINGS) { StatisticsSettingsScreen(navController) }
+            composable(Routes.TAG_GROUP_LIST) { TagGroupListScreen(navController) }
         }
     }
 }
