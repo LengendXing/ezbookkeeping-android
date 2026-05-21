@@ -1,0 +1,43 @@
+# Built application files
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Java/Kotlin
+*.class
+*.kt.swp
+
+# Gradle
+.gradle/
+build/
+local.properties
+*.jar
+
+# Android
+.cxx/
+captures/
+.externalNativeBuild/
+*.hprof
+
+# IDE
+.idea/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Keystore
+*.jks
+*.keystore
+
+# Room schemas (optional - uncomment if not tracking)
+# app/schemas/
+
+# Version
+!VERSION
