@@ -36,21 +36,12 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --no-daemon
-
       - name: Build Release APK
         run: ./gradlew assembleRelease --no-daemon
         env:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/*.apk
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
@@ -75,11 +66,9 @@ jobs:
             ### Changes
             See [maintain.md](https://github.com/${{ github.repository }}/blob/main/maintain.md) for changelog.
 
-            ### Downloads
-            - **release-apk** — Signed release build
-            - **debug-apk** — Debug build with logging
+            ### Download
+            Download the release APK below.
           files: |
             app/build/outputs/apk/release/*.apk
-            app/build/outputs/apk/debug/*.apk
           draft: false
           prerelease: false
