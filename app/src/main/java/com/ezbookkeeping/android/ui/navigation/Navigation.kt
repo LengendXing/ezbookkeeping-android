@@ -2,6 +2,7 @@ package com.ezbookkeeping.android.ui.navigation
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.PieChart
@@ -34,6 +35,10 @@ import com.ezbookkeeping.android.ui.screen.transaction.TransactionEditScreen
 import com.ezbookkeeping.android.ui.screen.transaction.TransactionListScreen
 import com.ezbookkeeping.android.ui.screen.signup.SignupScreen
 import com.ezbookkeeping.android.ui.screen.unlock.UnlockScreen
+import com.ezbookkeeping.android.ui.screen.user.DataManagementScreen
+import com.ezbookkeeping.android.ui.screen.user.SessionListScreen
+import com.ezbookkeeping.android.ui.screen.user.TwoFactorAuthScreen
+import com.ezbookkeeping.android.ui.screen.user.UserProfileScreen
 
 object Routes {
     const val HOME = "home"
@@ -56,6 +61,10 @@ object Routes {
     const val EXCHANGE = "exchange"
     const val SETTINGS = "settings"
     const val ABOUT = "about"
+    const val USER_PROFILE = "user/profile"
+    const val TWO_FACTOR_AUTH = "user/2fa"
+    const val SESSIONS = "user/sessions"
+    const val DATA_MANAGEMENT = "user/data"
 }
 
 data class BottomNavItem(val route: String, val label: String, val icon: @Composable () -> Unit)
@@ -67,8 +76,9 @@ fun EZBookkeepingNavHost() {
     val currentDestination = navBackStackEntry?.destination
 
     val bottomItems = listOf(
-        BottomNavItem(Routes.HOME, "Home") { Icon(Icons.Default.Home, contentDescription = "Home") },
-        BottomNavItem(Routes.TRANSACTION_LIST, "Transactions") { Icon(Icons.Default.List, contentDescription = "Transactions") },
+        BottomNavItem(Routes.HOME, "Details") { Icon(Icons.Default.Home, contentDescription = "Details") },
+        BottomNavItem(Routes.ACCOUNT_LIST, "Accounts") { Icon(Icons.Default.List, contentDescription = "Accounts") },
+        BottomNavItem(Routes.TRANSACTION_EDIT, "Add") { Icon(Icons.Default.Add, contentDescription = "Add") },
         BottomNavItem(Routes.STATISTICS, "Statistics") { Icon(Icons.Default.PieChart, contentDescription = "Statistics") },
         BottomNavItem(Routes.SETTINGS, "Settings") { Icon(Icons.Default.Settings, contentDescription = "Settings") }
     )
@@ -108,6 +118,10 @@ fun EZBookkeepingNavHost() {
             composable(Routes.EXCHANGE) { ExchangeRateScreen(navController) }
             composable(Routes.SETTINGS) { SettingsScreen(navController) }
             composable(Routes.ABOUT) { AboutScreen(navController) }
+            composable(Routes.USER_PROFILE) { UserProfileScreen(navController) }
+            composable(Routes.TWO_FACTOR_AUTH) { TwoFactorAuthScreen(navController) }
+            composable(Routes.SESSIONS) { SessionListScreen(navController) }
+            composable(Routes.DATA_MANAGEMENT) { DataManagementScreen(navController) }
         }
     }
 }
