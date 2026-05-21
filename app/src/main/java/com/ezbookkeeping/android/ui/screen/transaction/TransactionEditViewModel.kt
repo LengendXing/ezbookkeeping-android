@@ -2,12 +2,8 @@ package com.ezbookkeeping.android.ui.screen.transaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ezbookkeeping.android.data.db.entity.TransactionEntity
-import com.ezbookkeeping.android.data.db.entity.TransactionType
-import com.ezbookkeeping.android.data.remote.dto.CreateTransactionRequest
-import com.ezbookkeeping.android.data.repository.AccountRepository
-import com.ezbookkeeping.android.data.repository.CategoryRepository
-import com.ezbookkeeping.android.data.repository.TransactionRepository
+import com.ezbookkeeping.android.data.db.entity.*
+import com.ezbookkeeping.android.data.repository.*
 import com.ezbookkeeping.android.ui.navigation.AuthState
 import com.ezbookkeeping.android.util.DateUtil
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,30 +11,77 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class TransactionEditUiState(val type: TransactionType = TransactionType.EXPENSE, val sourceAccountId: Int = 0, val destinationAccountId: Int? = null, val sourceAmount: String = "", val destinationAmount: String = "", val categoryId: Int? = null, val tagIds: List<Int> = emptyList(), val comment: String = "", val date: String = DateUtil.today(), val time: String = "", val isLoading: Boolean = false, val error: String? = null, val saveSuccess: Boolean = false, val isEdit: Boolean = false)
+data class TransactionEditUiState(
+    val type: TransactionType = TransactionType.EXPENSE,
+    val sourceAmount: String = "",
+    val destinationAmount: String = "",
+    val categoryId: Int? = null,
+    val sourceAccountId: Int = 0,
+    val destinationAccountId: Int? = null,
+    val tagIds: List<Int> = emptyList(),
+    val comment: String = "",
+    val date: String = DateUtil.today(),
+    val time: String = "",
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val saveSuccess: Boolean = false,
+    val isEdit: Boolean = false,
+    // Lists for pickers
+    val accounts: List<AccountEntity> = emptyList(),
+    val categories: List<CategoryEntity> = emptyList(),
+    val tags: List<TagEntity> = emptyList(),
+    val tagGroups: List<TagGroupEntity> = emptyList()
+)
 
 @HiltViewModel
 class TransactionEditViewModel @Inject constructor(
     private val transactionRepo: TransactionRepository,
     private val accountRepo: AccountRepository,
     private val categoryRepo: CategoryRepository,
+    private val tagRepo: TagRepository,
     private val authState: AuthState
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(TransactionEditUiState())
     val uiState: StateFlow<TransactionEditUiState> = _uiState.asStateFlow()
 
-    fun onTypeChange(t: TransactionType) { _uiState.update { it.copy(type = t) } }
+    init { loadPickerData() }
+
+    private fun loadPickerData() {
+        val userId = authState.userId
+        viewModelScope.launch { accountRepo.getAccounts(userId).collect { list -> _uiState.update { it.copy(accounts = list) } } }
+        viewModelScope.launch { categoryRepo.getByUserId(userId).collect { list -> _uiState.update { it.copy(categories = list) } } }
+        viewModelScope.launch { tagRepo.getTags(userId).collect { list -> _uiState.update { it.copy(tags = list) } } }
+        viewModelScope.launch { tagRepo.getGroups(userId).collect { list -> _uiState.update { it.copy(tagGroups = list) } } }
+    }
+
+    fun onTypeChange(t: TransactionType) {
+        _uiState.update { it.copy(type = t, categoryId = null, destinationAccountId = null) }
+    }
     fun onAmountChange(v: String) { _uiState.update { it.copy(sourceAmount = v, error = null) } }
+    fun onDestinationAmountChange(v: String) { _uiState.update { it.copy(destinationAmount = v) } }
+    fun onCategoryChange(id: Int?) { _uiState.update { it.copy(categoryId = id) } }
+    fun onSourceAccountChange(id: Int) { _uiState.update { it.copy(sourceAccountId = id) } }
+    fun onDestinationAccountChange(id: Int?) { _uiState.update { it.copy(destinationAccountId = id) } }
     fun onCommentChange(v: String) { _uiState.update { it.copy(comment = v) } }
     fun onDateChange(v: String) { _uiState.update { it.copy(date = v) } }
-    fun onSourceAccountChange(id: Int) { _uiState.update { it.copy(sourceAccountId = id) } }
-    fun onCategoryChange(id: Int?) { _uiState.update { it.copy(categoryId = id) } }
+    fun onTimeChange(v: String) { _uiState.update { it.copy(time = v) } }
+    fun onTagToggle(tagId: Int) {
+        val current = _uiState.value.tagIds
+        _uiState.update { it.copy(tagIds = if (current.contains(tagId)) current - tagId else current + tagId) }
+    }
 
     fun loadTransaction(id: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isEdit = true) }
             transactionRepo.getById(id).first()?.let { tx ->
-                _uiState.update { it.copy(type = tx.type, sourceAccountId = tx.sourceAccountId, destinationAccountId = tx.destinationAccountId, sourceAmount = tx.sourceAmount.toString(), comment = tx.comment ?: "", date = tx.date, time = tx.time ?: "", categoryId = tx.categoryId) }
+                _uiState.update {
+                    it.copy(type = tx.type, sourceAccountId = tx.sourceAccountId,
+                        destinationAccountId = tx.destinationAccountId,
+                        sourceAmount = tx.sourceAmount.toString(),
+                        destinationAmount = tx.destinationAmount?.toString() ?: "",
+                        comment = tx.comment ?: "", date = tx.date, time = tx.time ?: "",
+                        categoryId = tx.categoryId, tagIds = tx.tagIds)
+                }
             }
         }
     }
@@ -47,11 +90,25 @@ class TransactionEditViewModel @Inject constructor(
         val s = _uiState.value
         val amount = s.sourceAmount.toDoubleOrNull()
         if (amount == null || amount <= 0) { _uiState.update { it.copy(error = "Invalid amount") }; return }
+        if (s.sourceAccountId == 0) { _uiState.update { it.copy(error = "Please select an account") }; return }
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val request = CreateTransactionRequest(sourceAccountId = s.sourceAccountId, destinationAccountId = s.destinationAccountId, sourceAmount = amount, destinationAmount = s.destinationAmount.toDoubleOrNull(), type = s.type.name.lowercase(), categoryId = s.categoryId, tagIds = s.tagIds, comment = s.comment.ifBlank { null }, date = s.date, time = s.time.ifBlank { null })
-                if (s.isEdit) { /* update via api */ } else transactionRepo.createRemoteTransaction(request)
+                val entity = TransactionEntity(
+                    id = if (s.isEdit) 0 else System.currentTimeMillis().hashCode(),
+                    userId = authState.userId,
+                    sourceAccountId = s.sourceAccountId,
+                    destinationAccountId = if (s.type == TransactionType.TRANSFER) s.destinationAccountId else null,
+                    sourceAmount = amount,
+                    destinationAmount = if (s.type == TransactionType.TRANSFER) s.destinationAmount.toDoubleOrNull() else null,
+                    type = s.type,
+                    categoryId = s.categoryId,
+                    tagIds = s.tagIds,
+                    comment = s.comment.ifBlank { null },
+                    date = s.date,
+                    time = s.time.ifBlank { null }
+                )
+                if (s.isEdit) transactionRepo.upsert(entity) else transactionRepo.upsert(entity)
                 _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
             } catch (e: Exception) { _uiState.update { it.copy(isLoading = false, error = e.message) } }
         }

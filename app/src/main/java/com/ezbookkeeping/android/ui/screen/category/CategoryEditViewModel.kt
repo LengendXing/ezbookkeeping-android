@@ -11,20 +11,45 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class CategoryEditUiState(val name: String = "", val type: CategoryType = CategoryType.EXPENSE, val icon: String = "label", val color: String = "#1B6B4D", val parentId: Int? = null, val isEdit: Boolean = false, val isLoading: Boolean = false, val error: String? = null, val saveSuccess: Boolean = false)
+data class CategoryEditUiState(
+    val name: String = "", val type: CategoryType = CategoryType.EXPENSE,
+    val icon: String = "label", val color: String = "#F44336",
+    val parentId: Int? = null, val categoryId: Int = 0,
+    val parentCategories: List<CategoryEntity> = emptyList(),
+    val isEdit: Boolean = false, val isLoading: Boolean = false,
+    val error: String? = null, val saveSuccess: Boolean = false
+)
 
 @HiltViewModel
-class CategoryEditViewModel @Inject constructor(private val categoryRepo: CategoryRepository, private val authState: AuthState) : ViewModel() {
+class CategoryEditViewModel @Inject constructor(
+    private val categoryRepo: CategoryRepository,
+    private val authState: AuthState
+) : ViewModel() {
     private val _uiState = MutableStateFlow(CategoryEditUiState())
     val uiState: StateFlow<CategoryEditUiState> = _uiState.asStateFlow()
 
+    init { loadParentCategories() }
+
+    private fun loadParentCategories() {
+        viewModelScope.launch {
+            categoryRepo.getByUserId(authState.userId).collect { all ->
+                val parents = all.filter { it.parentId == null }
+                _uiState.update { it.copy(parentCategories = parents) }
+            }
+        }
+    }
+
     fun onNameChange(v: String) { _uiState.update { it.copy(name = v, error = null) } }
-    fun onTypeChange(v: CategoryType) { _uiState.update { it.copy(type = v) } }
+    fun onTypeChange(v: CategoryType) { _uiState.update { it.copy(type = v, parentId = null) } }
+    fun onColorChange(v: String) { _uiState.update { it.copy(color = v) } }
+    fun onParentChange(id: Int?) { _uiState.update { it.copy(parentId = id) } }
 
     fun loadCategory(id: Int) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isEdit = true) }
-            categoryRepo.getById(id).first()?.let { c -> _uiState.update { it.copy(name = c.name, type = c.type, parentId = c.parentId) } }
+            _uiState.update { it.copy(isEdit = true, categoryId = id) }
+            categoryRepo.getById(id).first()?.let { c ->
+                _uiState.update { it.copy(name = c.name, type = c.type, icon = c.icon, color = c.color, parentId = c.parentId) }
+            }
         }
     }
 
@@ -34,7 +59,11 @@ class CategoryEditViewModel @Inject constructor(private val categoryRepo: Catego
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                categoryRepo.upsert(CategoryEntity(id = 0, userId = authState.userId, type = s.type, parentId = s.parentId, name = s.name, icon = s.icon, color = s.color))
+                categoryRepo.upsert(CategoryEntity(
+                    id = if (s.isEdit) s.categoryId else System.currentTimeMillis().hashCode(),
+                    userId = authState.userId, type = s.type, parentId = s.parentId,
+                    name = s.name, icon = s.icon, color = s.color
+                ))
                 _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
             } catch (e: Exception) { _uiState.update { it.copy(isLoading = false, error = e.message) } }
         }

@@ -10,16 +10,34 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class SettingsUiState(val serverUrl: String = "", val baseCurrency: String = "USD", val timezone: String = "UTC", val isLoggedOut: Boolean = false)
+data class SettingsUiState(
+    val serverUrl: String = "", val isLoggedOut: Boolean = false, val isStandalone: Boolean = true,
+    val isDarkTheme: Boolean = false, val timezone: String = "System Default",
+    val isAppLockEnabled: Boolean = false, val exchangeRateLastUpdate: String = "",
+    val isAutoUpdateExchangeRates: Boolean = false, val showAccountBalance: Boolean = true,
+    val isAnimationEnabled: Boolean = true, val version: String = "0.3.0"
+)
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(private val prefs: UserPreferences, private val authState: AuthState, private val userRepo: UserRepository) : ViewModel() {
+class SettingsViewModel @Inject constructor(
+    private val prefs: UserPreferences,
+    private val authState: AuthState,
+    private val userRepo: UserRepository
+) : ViewModel() {
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    init { viewModelScope.launch { prefs.serverUrl.collect { url -> _uiState.update { it.copy(serverUrl = url) } } } }
+    init {
+        viewModelScope.launch { prefs.serverUrl.collect { url -> _uiState.update { it.copy(serverUrl = url) } } }
+        _uiState.update { it.copy(isStandalone = authState.isStandalone) }
+    }
 
     fun onServerUrlChange(v: String) { _uiState.update { it.copy(serverUrl = v) } }
+    fun onDarkThemeToggle(v: Boolean) { _uiState.update { it.copy(isDarkTheme = v) } }
+    fun onAutoUpdateExchangeRatesToggle(v: Boolean) { _uiState.update { it.copy(isAutoUpdateExchangeRates = v) } }
+    fun onShowAccountBalanceToggle(v: Boolean) { _uiState.update { it.copy(showAccountBalance = v) } }
+    fun onAnimationToggle(v: Boolean) { _uiState.update { it.copy(isAnimationEnabled = v) } }
+
     fun saveServerUrl() { viewModelScope.launch { prefs.saveServerUrl(_uiState.value.serverUrl) } }
 
     fun logout() {
