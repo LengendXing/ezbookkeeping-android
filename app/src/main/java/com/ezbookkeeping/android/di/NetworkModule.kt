@@ -1,6 +1,7 @@
 package com.ezbookkeeping.android.di
 
 import com.ezbookkeeping.android.data.remote.api.EZBookkeepingApi
+import com.ezbookkeeping.android.service.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,39 +19,27 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private val json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-        isLenient = true
-    }
+    @Provides @Singleton
+    fun provideJson(): Json = Json { ignoreUnknownKeys = true; coerceInputValues = true; isLenient = true }
 
-    @Provides
-    @Singleton
-    fun provideJson(): Json = json
-
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(): OkHttpClient =
+    @Provides @Singleton
+    fun provideOkHttpClient(authInterceptor: AuthInterceptor): OkHttpClient =
         OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = HttpLoggingInterceptor.Level.BODY
-            })
+            .addInterceptor(authInterceptor)
+            .addInterceptor(HttpLoggingInterceptor().apply { level = HttpLoggingInterceptor.Level.BODY })
             .build()
 
-    @Provides
-    @Singleton
-    fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit =
+    @Provides @Singleton
+    fun provideRetrofit(okHttpClient: OkHttpClient, json: Json): Retrofit =
         Retrofit.Builder()
             .baseUrl("https://localhost:1/")
             .client(okHttpClient)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
 
-    @Provides
-    @Singleton
-    fun provideApi(retrofit: Retrofit): EZBookkeepingApi =
-        retrofit.create(EZBookkeepingApi::class.java)
+    @Provides @Singleton
+    fun provideApi(retrofit: Retrofit): EZBookkeepingApi = retrofit.create(EZBookkeepingApi::class.java)
 }

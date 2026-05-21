@@ -1,0 +1,42 @@
+package com.ezbookkeeping.android.ui.screen.category
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.ezbookkeeping.android.data.db.entity.CategoryEntity
+import com.ezbookkeeping.android.data.db.entity.CategoryType
+import com.ezbookkeeping.android.data.repository.CategoryRepository
+import com.ezbookkeeping.android.ui.navigation.AuthState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import javax.inject.Inject
+
+data class CategoryEditUiState(val name: String = "", val type: CategoryType = CategoryType.EXPENSE, val icon: String = "label", val color: String = "#1B6B4D", val parentId: Int? = null, val isEdit: Boolean = false, val isLoading: Boolean = false, val error: String? = null, val saveSuccess: Boolean = false)
+
+@HiltViewModel
+class CategoryEditViewModel @Inject constructor(private val categoryRepo: CategoryRepository, private val authState: AuthState) : ViewModel() {
+    private val _uiState = MutableStateFlow(CategoryEditUiState())
+    val uiState: StateFlow<CategoryEditUiState> = _uiState.asStateFlow()
+
+    fun onNameChange(v: String) { _uiState.update { it.copy(name = v, error = null) } }
+    fun onTypeChange(v: CategoryType) { _uiState.update { it.copy(type = v) } }
+
+    fun loadCategory(id: Int) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isEdit = true) }
+            categoryRepo.getById(id).first()?.let { c -> _uiState.update { it.copy(name = c.name, type = c.type, parentId = c.parentId) } }
+        }
+    }
+
+    fun save() {
+        val s = _uiState.value
+        if (s.name.isBlank()) { _uiState.update { it.copy(error = "Name required") }; return }
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                categoryRepo.upsert(CategoryEntity(id = 0, userId = authState.userId, type = s.type, parentId = s.parentId, name = s.name, icon = s.icon, color = s.color))
+                _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
+            } catch (e: Exception) { _uiState.update { it.copy(isLoading = false, error = e.message) } }
+        }
+    }
+}
