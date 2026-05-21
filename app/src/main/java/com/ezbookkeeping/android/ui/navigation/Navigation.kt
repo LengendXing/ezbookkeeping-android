@@ -53,6 +53,9 @@ import com.ezbookkeeping.android.ui.screen.settings.CategoryFilterSettingsScreen
 import com.ezbookkeeping.android.ui.screen.settings.TransactionTagFilterSettingsScreen
 import com.ezbookkeeping.android.ui.screen.settings.DisplayOrderSettingsScreen
 import com.ezbookkeeping.android.ui.screen.settings.CloudSyncSettingsScreen
+import com.ezbookkeeping.android.ui.screen.transaction.AmountFilterScreen
+import com.ezbookkeeping.android.ui.screen.account.MoveAllTransactionsScreen
+import com.ezbookkeeping.android.ui.screen.statistics.StatisticsSettingsScreen
 
 object Routes {
     const val HOME = "home"
@@ -92,6 +95,10 @@ object Routes {
     const val TRANSACTION_TAG_FILTER_SETTINGS = "settings/transaction-tag-filter"
     const val DISPLAY_ORDER_SETTINGS = "settings/display-order"
     const val CLOUD_SYNC_SETTINGS = "settings/cloud-sync"
+    const val AMOUNT_FILTER = "transactions/amount-filter"
+    const val MOVE_ALL_TRANSACTIONS = "accounts/move-all-transactions"
+    const val MOVE_ALL_TRANSACTIONS_WITH_ID = "accounts/move-all-transactions/{accountId}"
+    const val STATISTICS_SETTINGS = "settings/statistics-settings"
 }
 
 data class BottomNavItem(val route: String, val label: String, val icon: @Composable () -> Unit)
@@ -163,6 +170,10 @@ fun EZBookkeepingNavHost() {
             composable(Routes.TRANSACTION_TAG_FILTER_SETTINGS) { TransactionTagFilterSettingsScreen(navController) }
             composable(Routes.DISPLAY_ORDER_SETTINGS) { DisplayOrderSettingsScreen(navController) }
             composable(Routes.CLOUD_SYNC_SETTINGS) { CloudSyncSettingsScreen(navController) }
+            composable(Routes.AMOUNT_FILTER) { AmountFilterScreen(navController) }
+            composable(Routes.MOVE_ALL_TRANSACTIONS) { MoveAllTransactionsScreen(navController) }
+            composable(Routes.MOVE_ALL_TRANSACTIONS_WITH_ID, arguments = listOf(navArgument("accountId") { type = NavType.IntType })) { MoveAllTransactionsScreen(navController, it.arguments?.getInt("accountId")) }
+            composable(Routes.STATISTICS_SETTINGS) { StatisticsSettingsScreen(navController) }
         }
     }
 }

@@ -2,9 +2,11 @@ package com.ezbookkeeping.android.ui.screen.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ezbookkeeping.android.data.db.entity.TemplateEntity
 import com.ezbookkeeping.android.data.db.entity.TransactionEntity
 import com.ezbookkeeping.android.data.db.entity.TransactionType
 import com.ezbookkeeping.android.data.local.UserPreferences
+import com.ezbookkeeping.android.data.repository.TemplateRepository
 import com.ezbookkeeping.android.data.repository.TransactionRepository
 import com.ezbookkeeping.android.ui.navigation.AuthState
 import com.ezbookkeeping.android.util.DateUtil
@@ -17,6 +19,7 @@ import javax.inject.Inject
 
 data class HomeUiState(
     val transactions: List<TransactionEntity> = emptyList(),
+    val templates: List<TemplateEntity> = emptyList(),
     val monthExpense: Double = 0.0,
     val monthIncome: Double = 0.0,
     val todayExpense: Double = 0.0,
@@ -27,6 +30,7 @@ data class HomeUiState(
     val thisYearIncome: Double = 0.0,
     val showAmount: Boolean = true,
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val monthLabel: String = "",
     val todayDate: String = "",
     val thisWeekRange: String = "",
@@ -37,6 +41,7 @@ data class HomeUiState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val transactionRepo: TransactionRepository,
+    private val templateRepo: TemplateRepository,
     private val authState: AuthState,
     private val prefs: UserPreferences
 ) : ViewModel() {
@@ -51,6 +56,7 @@ class HomeViewModel @Inject constructor(
     init {
         loadDateLabels()
         loadTransactions()
+        loadTemplates()
     }
 
     private fun loadDateLabels() {
@@ -88,65 +94,75 @@ class HomeViewModel @Inject constructor(
         _uiState.update { it.copy(showAmount = !it.showAmount) }
     }
 
+    fun refresh() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true) }
+            loadTransactionsInternal()
+            loadDateLabels()
+            _uiState.update { it.copy(isRefreshing = false) }
+        }
+    }
+
+    private fun loadTemplates() {
+        viewModelScope.launch {
+            templateRepo.getByUserId(authState.userId)
+                .catch { }
+                .collect { list -> _uiState.update { it.copy(templates = list) } }
+        }
+    }
+
     fun loadTransactions() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
-
-            val now = Calendar.getInstance()
-            val userId = authState.userId
-
-            // Load month transactions
-            transactionRepo.getByDateRange(userId, DateUtil.monthStart(), DateUtil.monthEnd())
-                .catch { _uiState.update { it.copy(isLoading = false) } }
-                .collect { monthList ->
-                    val monthExp = monthList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
-                    val monthInc = monthList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
-
-                    // Load today
-                    val todayStart = DateUtil.dayStart()
-                    val todayEnd = DateUtil.dayEnd()
-                    transactionRepo.getByDateRange(userId, todayStart, todayEnd)
-                        .catch { }
-                        .collect { todayList ->
-                            val todayExp = todayList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
-                            val todayInc = todayList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
-
-                            // Load this week
-                            val weekStart = DateUtil.weekStart()
-                            val weekEnd = DateUtil.weekEnd()
-                            transactionRepo.getByDateRange(userId, weekStart, weekEnd)
-                                .catch { }
-                                .collect { weekList ->
-                                    val weekExp = weekList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
-                                    val weekInc = weekList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
-
-                                    // Load this year
-                                    val yearStart = DateUtil.yearStart()
-                                    val yearEnd = DateUtil.yearEnd()
-                                    transactionRepo.getByDateRange(userId, yearStart, yearEnd)
-                                        .catch { }
-                                        .collect { yearList ->
-                                            val yearExp = yearList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
-                                            val yearInc = yearList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
-
-                                            _uiState.update {
-                                                it.copy(
-                                                    transactions = monthList,
-                                                    monthExpense = monthExp,
-                                                    monthIncome = monthInc,
-                                                    todayExpense = todayExp,
-                                                    todayIncome = todayInc,
-                                                    thisWeekExpense = weekExp,
-                                                    thisWeekIncome = weekInc,
-                                                    thisYearExpense = yearExp,
-                                                    thisYearIncome = yearInc,
-                                                    isLoading = false
-                                                )
-                                            }
-                                        }
-                                }
-                        }
-                }
+            loadTransactionsInternal()
         }
+    }
+
+    private suspend fun loadTransactionsInternal() {
+        val now = Calendar.getInstance()
+        val userId = authState.userId
+
+        transactionRepo.getByDateRange(userId, DateUtil.monthStart(), DateUtil.monthEnd())
+            .catch { _uiState.update { it.copy(isLoading = false) } }
+            .collect { monthList ->
+                val monthExp = monthList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
+                val monthInc = monthList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
+
+                transactionRepo.getByDateRange(userId, DateUtil.dayStart(), DateUtil.dayEnd())
+                    .catch { }
+                    .collect { todayList ->
+                        val todayExp = todayList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
+                        val todayInc = todayList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
+
+                        transactionRepo.getByDateRange(userId, DateUtil.weekStart(), DateUtil.weekEnd())
+                            .catch { }
+                            .collect { weekList ->
+                                val weekExp = weekList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
+                                val weekInc = weekList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
+
+                                transactionRepo.getByDateRange(userId, DateUtil.yearStart(), DateUtil.yearEnd())
+                                    .catch { }
+                                    .collect { yearList ->
+                                        val yearExp = yearList.filter { it.type == TransactionType.EXPENSE }.sumOf { it.sourceAmount }
+                                        val yearInc = yearList.filter { it.type == TransactionType.INCOME }.sumOf { it.sourceAmount }
+
+                                        _uiState.update {
+                                            it.copy(
+                                                transactions = monthList,
+                                                monthExpense = monthExp,
+                                                monthIncome = monthInc,
+                                                todayExpense = todayExp,
+                                                todayIncome = todayInc,
+                                                thisWeekExpense = weekExp,
+                                                thisWeekIncome = weekInc,
+                                                thisYearExpense = yearExp,
+                                                thisYearIncome = yearInc,
+                                                isLoading = false
+                                            )
+                                        }
+                                    }
+                            }
+                    }
+            }
     }
 }

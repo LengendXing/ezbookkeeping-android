@@ -1,5 +1,38 @@
 # ezBookkeeping Android - 变更日志
 
+## v0.6.0 - 2026-05-21
+### 变更内容
+- Phase 6 核心交互补齐：12个通用组件 + 3个屏幕增强 + 3个新页面
+### 影响范围
+- ui/component/* (12个新组件: NumberPadSheet, TreeViewSelectionSheet, TwoColumnListItemSelectionSheet, DateSelectionSheet, DateTimeSelectionSheet, DateRangeSelectionSheet, ColorSelectionSheet, IconSelectionSheet, TransactionTagSelectionSheet, ListItemSelectionSheet, PinCodeInputSheet, PasswordInputSheet)
+- ui/screen/home/* (HomeScreen 重写: pull-to-refresh, 长按FAB弹出模板, 隐私模式eye图标)
+- ui/screen/transaction/TransactionEditScreen (4种交易类型+NumberPad+TreeView选择+标签多选+更多操作菜单)
+- ui/screen/transaction/TransactionListScreen (搜索+pull-to-refresh+无限滚动+账户/分类/标签/日期筛选)
+- ui/screen/transaction/AmountFilterScreen (新增)
+- ui/screen/account/MoveAllTransactionsScreen (新增)
+- ui/screen/statistics/StatisticsSettingsScreen (新增)
+- ui/navigation/Navigation.kt (3新路由)
+### 功能列表
+- NumberPadSheet: 自定义数字键盘金额输入(支持小数点+退格+确认)
+- TreeViewSelectionSheet: 分类树形选择(带搜索过滤+层级缩进)
+- TwoColumnListItemSelectionSheet: 账户按类型分组选择
+- DateSelectionSheet: 日历式日期选择器(月份导航+今日高亮)
+- DateTimeSelectionSheet: 日期+时间选择器(小时+分钟滚动列表)
+- DateRangeSelectionSheet: 日期范围选择器(快速范围: 本周/本月/本年)
+- ColorSelectionSheet: 颜色选择器(30色调色板+预览)
+- IconSelectionSheet: 图标选择器(46个Material图标网格)
+- TransactionTagSelectionSheet: 标签多选(按分组显示+checkbox+全选清除)
+- ListItemSelectionSheet: 通用列表单项选择
+- PinCodeInputSheet: PIN码输入(4位圆点指示器+数字键盘)
+- PasswordInputSheet: 密码确认输入(显示/隐藏切换+错误提示)
+- HomeScreen: PullToRefreshBox下拉刷新, ExperimentalFoundationApi长按FAB弹出模板DropdownMenu
+- TransactionEditScreen: ModifyBalance第4种交易类型, NumberPadSheet金额输入, TreeViewSelectionSheet分类选择, TwoColumnListItemSelectionSheet账户选择, DateTimeSelectionSheet日期时间, TransactionTagSelectionSheet标签多选, 更多操作菜单(复制/存为模板)
+- TransactionListScreen: SearchBar搜索, PullToRefreshBox下拉刷新, 无限滚动加载更多, 导入按钮, 账户/分类/标签/日期范围筛选, DateRangeSelectionSheet
+- AmountFilterScreen: 金额范围筛选(最小/最大+快速预设<100/100-1k/>1k)
+- MoveAllTransactionsScreen: 移动全部交易到其他账户(密码确认+危险操作警告)
+- StatisticsSettingsScreen: 统计设置(图表类型4种/数据类型3种/聚合方式4种/排序2种/子分类显示/其他分类阈值)
+- Navigation: AMOUNT_FILTER, MOVE_ALL_TRANSACTIONS, MOVE_ALL_TRANSACTIONS_WITH_ID, STATISTICS_SETTINGS 路由
+
 ## v0.5.0 - 2026-05-21
 ### 变更内容
 - P1+P2 全部页面实现 + 90 新增测试用例

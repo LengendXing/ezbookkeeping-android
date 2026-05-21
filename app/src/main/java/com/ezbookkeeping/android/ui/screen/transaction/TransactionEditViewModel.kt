@@ -13,6 +13,7 @@ import javax.inject.Inject
 
 data class TransactionEditUiState(
     val type: TransactionType = TransactionType.EXPENSE,
+    val typeExt: TransactionTypeExt = TransactionTypeExt.EXPENSE,
     val sourceAmount: String = "",
     val destinationAmount: String = "",
     val categoryId: Int? = null,
@@ -26,7 +27,6 @@ data class TransactionEditUiState(
     val error: String? = null,
     val saveSuccess: Boolean = false,
     val isEdit: Boolean = false,
-    // Lists for pickers
     val accounts: List<AccountEntity> = emptyList(),
     val categories: List<CategoryEntity> = emptyList(),
     val tags: List<TagEntity> = emptyList(),
@@ -54,9 +54,16 @@ class TransactionEditViewModel @Inject constructor(
         viewModelScope.launch { tagRepo.getGroups(userId).collect { list -> _uiState.update { it.copy(tagGroups = list) } } }
     }
 
-    fun onTypeChange(t: TransactionType) {
-        _uiState.update { it.copy(type = t, categoryId = null, destinationAccountId = null) }
+    fun onTypeExtChange(t: TransactionTypeExt) {
+        val transactionType = when (t) {
+            TransactionTypeExt.EXPENSE -> TransactionType.EXPENSE
+            TransactionTypeExt.INCOME -> TransactionType.INCOME
+            TransactionTypeExt.TRANSFER -> TransactionType.TRANSFER
+            TransactionTypeExt.MODIFY_BALANCE -> TransactionType.EXPENSE
+        }
+        _uiState.update { it.copy(typeExt = t, type = transactionType, categoryId = null, destinationAccountId = null) }
     }
+
     fun onAmountChange(v: String) { _uiState.update { it.copy(sourceAmount = v, error = null) } }
     fun onDestinationAmountChange(v: String) { _uiState.update { it.copy(destinationAmount = v) } }
     fun onCategoryChange(id: Int?) { _uiState.update { it.copy(categoryId = id) } }
@@ -69,13 +76,19 @@ class TransactionEditViewModel @Inject constructor(
         val current = _uiState.value.tagIds
         _uiState.update { it.copy(tagIds = if (current.contains(tagId)) current - tagId else current + tagId) }
     }
+    fun setTagIds(ids: List<Int>) { _uiState.update { it.copy(tagIds = ids) } }
 
     fun loadTransaction(id: Int) {
         viewModelScope.launch {
             _uiState.update { it.copy(isEdit = true) }
             transactionRepo.getById(id).first()?.let { tx ->
+                val typeExt = when (tx.type) {
+                    TransactionType.EXPENSE -> TransactionTypeExt.EXPENSE
+                    TransactionType.INCOME -> TransactionTypeExt.INCOME
+                    TransactionType.TRANSFER -> TransactionTypeExt.TRANSFER
+                }
                 _uiState.update {
-                    it.copy(type = tx.type, sourceAccountId = tx.sourceAccountId,
+                    it.copy(type = tx.type, typeExt = typeExt, sourceAccountId = tx.sourceAccountId,
                         destinationAccountId = tx.destinationAccountId,
                         sourceAmount = tx.sourceAmount.toString(),
                         destinationAmount = tx.destinationAmount?.toString() ?: "",
@@ -108,7 +121,7 @@ class TransactionEditViewModel @Inject constructor(
                     date = s.date,
                     time = s.time.ifBlank { null }
                 )
-                if (s.isEdit) transactionRepo.upsert(entity) else transactionRepo.upsert(entity)
+                transactionRepo.upsert(entity)
                 _uiState.update { it.copy(isLoading = false, saveSuccess = true) }
             } catch (e: Exception) { _uiState.update { it.copy(isLoading = false, error = e.message) } }
         }
