@@ -34,7 +34,9 @@ data class TransactionEditUiState(
     val tagGroups: List<TagGroupEntity> = emptyList(),
     val scheduleFrequency: ScheduleFrequency? = null,
     val scheduleStartDate: String = "",
-    val scheduleEndDate: String = ""
+    val scheduleEndDate: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )
 
 @HiltViewModel
@@ -84,6 +86,7 @@ class TransactionEditViewModel @Inject constructor(
     fun setScheduleFrequency(f: ScheduleFrequency) { _uiState.update { it.copy(scheduleFrequency = f) } }
     fun setScheduleStartDate(d: String) { _uiState.update { it.copy(scheduleStartDate = d) } }
     fun setScheduleEndDate(d: String) { _uiState.update { it.copy(scheduleEndDate = d) } }
+    fun setLocation(lat: Double, lng: Double) { _uiState.update { it.copy(latitude = lat, longitude = lng) } }
 
     fun loadTransaction(id: Int) {
         viewModelScope.launch {

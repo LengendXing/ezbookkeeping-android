@@ -56,6 +56,10 @@ import com.ezbookkeeping.android.ui.screen.settings.CloudSyncSettingsScreen
 import com.ezbookkeeping.android.ui.screen.transaction.AmountFilterScreen
 import com.ezbookkeeping.android.ui.screen.account.MoveAllTransactionsScreen
 import com.ezbookkeeping.android.ui.screen.statistics.StatisticsSettingsScreen
+import com.ezbookkeeping.android.ui.screen.auth.ForgetPasswordScreen
+import com.ezbookkeeping.android.ui.screen.auth.ResetPasswordScreen
+import com.ezbookkeeping.android.ui.screen.auth.VerifyEmailScreen
+import com.ezbookkeeping.android.ui.screen.auth.OAuth2CallbackScreen
 import com.ezbookkeeping.android.ui.screen.tag.TagGroupListScreen
 
 object Routes {
@@ -101,6 +105,10 @@ object Routes {
     const val MOVE_ALL_TRANSACTIONS_WITH_ID = "accounts/move-all-transactions/{accountId}"
     const val STATISTICS_SETTINGS = "settings/statistics-settings"
     const val TAG_GROUP_LIST = "tags/groups"
+    const val FORGET_PASSWORD = "auth/forgot-password"
+    const val RESET_PASSWORD = "auth/reset-password"
+    const val VERIFY_EMAIL = "auth/verify-email"
+    const val OAUTH2_CALLBACK = "auth/oauth2-callback"
 }
 
 data class BottomNavItem(val route: String, val label: String, val icon: @Composable () -> Unit)
@@ -177,6 +185,10 @@ fun EZBookkeepingNavHost() {
             composable(Routes.MOVE_ALL_TRANSACTIONS_WITH_ID, arguments = listOf(navArgument("accountId") { type = NavType.IntType })) { MoveAllTransactionsScreen(navController, it.arguments?.getInt("accountId")) }
             composable(Routes.STATISTICS_SETTINGS) { StatisticsSettingsScreen(navController) }
             composable(Routes.TAG_GROUP_LIST) { TagGroupListScreen(navController) }
+            composable(Routes.FORGET_PASSWORD) { ForgetPasswordScreen(navController) }
+            composable(Routes.RESET_PASSWORD) { ResetPasswordScreen(navController) }
+            composable(Routes.VERIFY_EMAIL) { VerifyEmailScreen(navController) }
+            composable(Routes.OAUTH2_CALLBACK) { OAuth2CallbackScreen(navController) }
         }
     }
 }

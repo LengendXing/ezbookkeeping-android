@@ -43,6 +43,9 @@ fun TransactionEditScreen(navController: NavController, transactionId: Int? = nu
     var showScheduleFreqPicker by remember { mutableStateOf(false) }
     var showScheduleStartPicker by remember { mutableStateOf(false) }
     var showScheduleEndPicker by remember { mutableStateOf(false) }
+    var showMapPicker by remember { mutableStateOf(false) }
+    var showAIRecognition by remember { mutableStateOf(false) }
+    var showVoiceInput by remember { mutableStateOf(false) }
 
     Scaffold(topBar = {
         TopAppBar(
@@ -235,6 +238,25 @@ fun TransactionEditScreen(navController: NavController, transactionId: Int? = nu
                 }
             }
 
+            // Advanced features section
+            item {
+                HorizontalDivider()
+                Text("Advanced", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+            }
+            item {
+                ListItem(
+                    headlineContent = { Text("Location") },
+                    supportingContent = { Text(if (state.latitude != 0.0 || state.longitude != 0.0) "${state.latitude}, ${state.longitude}" else "Not set") },
+                    modifier = Modifier.clickable { showMapPicker = true }
+                )
+            }
+            item {
+                Row(Modifier.fillMaxWidth().padding(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    OutlinedButton(onClick = { showAIRecognition = true }, modifier = Modifier.weight(1f)) { Text("AI Scan") }
+                    OutlinedButton(onClick = { showVoiceInput = true }, modifier = Modifier.weight(1f)) { Text("Voice") }
+                }
+            }
+
             // Error
             if (state.error != null) {
                 item { Text(state.error!!, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall) }
@@ -363,4 +385,14 @@ fun TransactionEditScreen(navController: NavController, transactionId: Int? = nu
         onDismiss = { showScheduleEndPicker = false },
         onSelect = { vm.setScheduleEndDate(it); showScheduleEndPicker = false }
     )
+
+    // Map picker
+    MapSheet(visible = showMapPicker, initialLat = state.latitude, initialLng = state.longitude,
+        onDismiss = { showMapPicker = false }, onSelect = { lat, lng -> vm.setLocation(lat, lng); showMapPicker = false })
+
+    // AI recognition
+    AIImageRecognitionSheet(visible = showAIRecognition, onDismiss = { showAIRecognition = false }, onResult = { comment, amount -> vm.onCommentChange(comment); vm.onAmountChange(amount.toString()); showAIRecognition = false })
+
+    // Voice input
+    VoiceTransactionSheet(visible = showVoiceInput, onDismiss = { showVoiceInput = false }, onResult = { comment, amount -> vm.onCommentChange(comment); vm.onAmountChange(amount.toString()); showVoiceInput = false })
 }

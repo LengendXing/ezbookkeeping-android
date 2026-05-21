@@ -24,10 +24,13 @@ data class TransactionImportUiState(
     val previewData: List<ImportPreviewRow> = emptyList(),
     val importResult: String? = null,
     val isImporting: Boolean = false,
-    val selectedFormat: ImportFormat = ImportFormat.CSV
+    val selectedFormat: ImportFormat = ImportFormat.CSV,
+    val step: ImportStep = ImportStep.UPLOAD,
+    val columnMapping: Map<String, String> = emptyMap()
 )
 
 enum class ImportFormat(val label: String) { CSV("CSV"), OFX("OFX"), QIF("QIF") }
+enum class ImportStep { UPLOAD, DEFINE_COLUMNS, REVIEW, EXECUTE }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,44 +44,74 @@ fun TransactionImportScreen(navController: NavController) {
         })
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            // Format selector
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                ImportFormat.values().forEach { fmt ->
-                    FilterChip(selected = state.selectedFormat == fmt, onClick = { vm.setFormat(fmt) }, label = { Text(fmt.label) })
+            // Step indicator
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                ImportStep.entries.forEach { step ->
+                    FilterChip(selected = state.step == step, onClick = { if (step.ordinal < state.step.ordinal) vm.goToStep(step) },
+                        label = { Text(step.name.replace("_", " ").lowercase().replaceFirstChar { it.uppercase() }, style = MaterialTheme.typography.labelSmall) })
                 }
             }
 
-            // Pick file button
-            OutlinedButton(onClick = vm::pickFile, modifier = Modifier.fillMaxWidth()) {
-                Text("Select File to Import")
-            }
-
-            // Preview
-            if (state.previewData.isNotEmpty()) {
-                Text("Preview (${state.previewData.size} transactions)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
-                LazyColumn(Modifier.weight(1f)) {
-                    items(state.previewData) { row ->
-                        ListItem(
-                            headlineContent = { Text(row.comment, maxLines = 1) },
-                            supportingContent = { Text(row.date) },
-                            trailingContent = { Text(AmountUtil.format(row.amount), fontWeight = FontWeight.Bold, color = when(row.type) { TransactionType.EXPENSE -> MaterialTheme.colorScheme.error; TransactionType.INCOME -> MaterialTheme.colorScheme.primary; TransactionType.TRANSFER -> MaterialTheme.colorScheme.tertiary }) }
-                        )
+            when (state.step) {
+                ImportStep.UPLOAD -> {
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        ImportFormat.entries.forEach { fmt ->
+                            FilterChip(selected = state.selectedFormat == fmt, onClick = { vm.setFormat(fmt) }, label = { Text(fmt.label) })
+                        }
+                    }
+                    OutlinedButton(onClick = vm::pickFile, modifier = Modifier.fillMaxWidth()) { Text("Select File to Import") }
+                    if (state.previewData.isNotEmpty()) {
+                        Button(onClick = { vm.goToStep(ImportStep.DEFINE_COLUMNS) }, modifier = Modifier.fillMaxWidth()) { Text("Next: Define Columns") }
                     }
                 }
-                Button(onClick = vm::confirmImport, modifier = Modifier.fillMaxWidth(), enabled = !state.isImporting) {
-                    if (state.isImporting) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary)
-                    else Text("Import ${state.previewData.size} Transactions")
+                ImportStep.DEFINE_COLUMNS -> {
+                    Text("Column Mapping", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
+                    val columns = listOf("Date", "Amount", "Type", "Category", "Comment", "Account")
+                    columns.forEach { col ->
+                        val mapped = state.columnMapping[col] ?: ""
+                        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Text(col, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+                            var selected by remember(mapped) { mutableStateOf(mapped) }
+                            OutlinedTextField(value = selected, onValueChange = { selected = it; vm.setColumnMapping(col, it) }, modifier = Modifier.weight(1f), singleLine = true, placeholder = { Text("Column #") })
+                        }
+                    }
+                    Spacer(Modifier.height(8.dp))
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = { vm.goToStep(ImportStep.UPLOAD) }, modifier = Modifier.weight(1f)) { Text("Back") }
+                        Button(onClick = { vm.goToStep(ImportStep.REVIEW) }, modifier = Modifier.weight(1f)) { Text("Next: Review") }
+                    }
                 }
-            }
-
-            if (state.importResult != null) {
-                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                    Text(state.importResult!!, modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onPrimaryContainer)
+                ImportStep.REVIEW -> {
+                    if (state.previewData.isNotEmpty()) {
+                        Text("Preview (${state.previewData.size} transactions)", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.primary)
+                        LazyColumn(Modifier.weight(1f)) {
+                            items(state.previewData) { row ->
+                                ListItem(
+                                    headlineContent = { Text(row.comment, maxLines = 1) },
+                                    supportingContent = { Text(row.date) },
+                                    trailingContent = { Text(AmountUtil.format(row.amount), fontWeight = FontWeight.Bold) }
+                                )
+                            }
+                        }
+                    }
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        OutlinedButton(onClick = { vm.goToStep(ImportStep.DEFINE_COLUMNS) }, modifier = Modifier.weight(1f)) { Text("Back") }
+                        Button(onClick = { vm.goToStep(ImportStep.EXECUTE); vm.confirmImport() }, modifier = Modifier.weight(1f), enabled = !state.isImporting) {
+                            if (state.isImporting) CircularProgressIndicator(Modifier.size(20.dp), strokeWidth = 2.dp, color = MaterialTheme.colorScheme.onPrimary) else Text("Import")
+                        }
+                    }
                 }
-            }
-
-            if (state.isLoading) {
-                Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                ImportStep.EXECUTE -> {
+                    if (state.importResult != null) {
+                        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
+                            Text(state.importResult!!, modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.onPrimaryContainer)
+                        }
+                    }
+                    if (state.isLoading) {
+                        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) { CircularProgressIndicator() }
+                    }
+                    Button(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth()) { Text("Done") }
+                }
             }
         }
     }

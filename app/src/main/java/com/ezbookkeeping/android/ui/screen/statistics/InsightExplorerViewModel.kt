@@ -39,6 +39,10 @@ class InsightExplorerViewModel @Inject constructor() : ViewModel() {
         loadData(period)
     }
 
+    fun runQuery(queryType: String, dateFrom: String, dateTo: String) {
+        loadData(_uiState.value.selectedPeriod)
+    }
+
     private fun loadData(period: InsightPeriod) {
         _uiState.update { it.copy(isLoading = true) }
         val insights = listOf(
